@@ -437,6 +437,7 @@
 							hitTestSource = null;
 
 							document.getElementById("place-button").style.display = "none";
+							document.getElementById("complete-button").style.display = "none";
 
 							reticle.visible = false;
 
@@ -450,11 +451,12 @@
 
 						const hitTestResults = frame.getHitTestResults( hitTestSource );
 
-						if ( hitTestResults.length ) {
+						if ( hitTestResults.length && modeindex == 0 ) {
 
 							const hit = hitTestResults[ 0 ];
 
 							document.getElementById("place-button").style.display = "block";
+							document.getElementById("complete-button").style.display = "block";
 							reticle.visible = true;
 							reticle.matrix.fromArray( hit.getPose( referenceSpace ).transform.matrix );
 
@@ -462,6 +464,7 @@
 
 							reticle.visible = false;
 							document.getElementById("place-button").style.display = "none";
+							document.getElementById("complete-button").style.display = "none";
 
 						}
 

@@ -124,7 +124,7 @@ body {
     left: calc(45%);
     width: 100px;
     height: 35px;
-    display: block;
+    display: none;
   }
 
   #complete-button{
@@ -133,7 +133,7 @@ body {
     left: calc(45%);
     width: 100px;
     height: 35px;
-    display: block;
+    display: none;
   }
 
   #mode01-button{

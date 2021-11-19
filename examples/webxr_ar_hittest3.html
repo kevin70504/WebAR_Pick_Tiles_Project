@@ -23,6 +23,7 @@
 		
 		<button type="button" id="place-button">PLACE</button>
 		<button type="button" id="complete-button">Complete</button>
+		<button type="button" id="mode01-button">Select Mode</button>
 
 		</div>
 
@@ -61,6 +62,12 @@
 			let mat_arr = [];
 			let mat_index = 0;
 			let index = 0;
+			let modeindex = 0;
+
+			let raycaster = new THREE.Raycaster();
+			let clickMouse = new THREE.Vector2();
+			let draggable = THREE.Object3D;
+
 
 			init();
 			animate();
@@ -216,12 +223,12 @@
 				//
 				const setbtn = document.getElementById("place-button");
 				setbtn.addEventListener("click",function(){
-					if ( reticle.visible && index == 0 ) {
+					if ( reticle.visible && index == 0 && modeindex == 0) {
 						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
 						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
 						mesh_arr[mesh_index].visible = true;
 					}
-					else if(reticle.visible && index == 1){
+					else if(reticle.visible && index == 1 && modeindex == 0){
 						const Material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
 						mat_arr.push(Material);
 						const Mesh = new THREE.Mesh( planegeo, mat_arr[mat_index] );
@@ -240,6 +247,18 @@
 						index++;
 						mat_index++;
 						mesh_index++;
+					}
+				});
+
+				//
+				const mode01btn = document.getElementById("mode01-button")
+				mode01btn.addEventListener("click",function(){
+					if(modeindex == 0 ){
+						modeindex++;
+						reticle.visible = false;
+					}
+					else{
+						modeindex = 0;
 					}
 				});
 				//
@@ -265,34 +284,60 @@
 				//
 
 				//用單指觸碰
-				renderer.domElement.addEventListener('touchstart', function(e){
+				if(modeindex == 0 && reticle.visible == true){
+
+					renderer.domElement.addEventListener('touchstart', function(e){
 					e.preventDefault();
 					touchDown=true;
 					touchX = e.touches[0].pageX;
 					touchY = e.touches[0].pageY;
-				}, false);
+					}, false);
 
-				renderer.domElement.addEventListener('touchend', function(e){
-					e.preventDefault();
-					touchDown = false;
-				}, false);
+					renderer.domElement.addEventListener('touchend', function(e){
+						e.preventDefault();
+						touchDown = false;
+					}, false);
 
-				renderer.domElement.addEventListener('touchmove', function(e){
-					e.preventDefault();
-					
-					if(!touchDown){
-						return;
-					}
+					renderer.domElement.addEventListener('touchmove', function(e){
+						e.preventDefault();
+						
+						if(!touchDown){
+							return;
+						}
 
-					deltaX = e.touches[0].pageX - touchX;
-					deltaY = e.touches[0].pageY - touchY;
-					touchX = e.touches[0].pageX;
-					touchY = e.touches[0].pageY;
+						deltaX = e.touches[0].pageX - touchX;
+						deltaY = e.touches[0].pageY - touchY;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
 
-					scaleObject();
+						scaleObject();
 
-				}, false);
+					}, false);
+				}
+				//
+				//選擇模式
+				if(modeindex == 1 &&　reticle.visible == false){
+					renderer.domElement.addEventListener("click",event =>{
+					//透過滑鼠點選的位置計算出 raycaster 所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
+					clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+					clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+					// 透過滑鼠點的位置和當前相機的矩陣計算出 raycaster值
+					raycaster.setFromCamera(clickMouse,camera);
+					// 取得 raycaster 射線和所有物件相交的陣列集合
+					const found = raycaster.intersectObjects(scene.children);
+					if(found.length > 0 && found[0].object.userData.draggable){
+						draggable = found[0].object;
+						found[0].object.material.color.set(0x535353);
+						console.log("找到",draggable.userData.name);
+						}
+					});
+
+				}
+
+				//
 		}
+
 
 		//
 

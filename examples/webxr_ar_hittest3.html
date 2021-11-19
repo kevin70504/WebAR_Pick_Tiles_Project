@@ -159,6 +159,8 @@
 				mesh_arr.push(mesh);
 				scene.add( mesh_arr[0]);
 
+				console.log(mat_arr[mat_index]);
+
 				/*function onSelect() {
 
 					if ( reticle.visible ) {
@@ -173,7 +175,7 @@
 
 				const matbtn01 = document.getElementById("1");
 				matbtn01.addEventListener("click",function(){
-					mat_arr[mat_index] = tex_arr[0];
+					mat_arr[mat_index].map = tex_arr[0];
 					tex_arr[1].dispose();
 					tex_arr[2].dispose();
 					tex_arr[3].dispose();
@@ -183,7 +185,7 @@
 
 				const matbtn02 = document.getElementById("2");
 				matbtn02.addEventListener("click",function(){
-					mat_arr[mat_index] = tex_arr[1];
+					mat_arr[mat_index].map = tex_arr[1];
 					tex_arr[0].dispose();
 					tex_arr[2].dispose();
 					tex_arr[3].dispose();
@@ -193,7 +195,7 @@
 
 				const matbtn03 = document.getElementById("3");
 				matbtn03.addEventListener("click",function(){
-					mat_arr[mat_index] =tex_arr[2];
+					mat_arr[mat_index].map =tex_arr[2];
 					tex_arr[0].dispose();
 					tex_arr[1].dispose();
 					tex_arr[3].dispose();
@@ -203,7 +205,7 @@
 
 				const matbtn04 = document.getElementById("4");
 				matbtn04.addEventListener("click",function(){
-					mat_arr[mat_index] = tex_arr[3];
+					mat_arr[mat_index].map = tex_arr[3];
 					tex_arr[0].dispose();
 					tex_arr[1].dispose();
 					tex_arr[2].dispose();

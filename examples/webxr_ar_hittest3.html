@@ -169,17 +169,17 @@
 
 				const matbtn01 = document.getElementById("1");
 				matbtn01.addEventListener("click",function(){
-					material.map = tex_arr[0];
+					mat_arr[mat_index] = tex_arr[0];
 					tex_arr[1].dispose();
 					tex_arr[2].dispose();
 					tex_arr[3].dispose();
 					tex_arr[0].needsUpdate = true;
-					material.needsUpdate = true;
+					mat_arr[mat_index].needsUpdate = true;
 				});
 
 				const matbtn02 = document.getElementById("2");
 				matbtn02.addEventListener("click",function(){
-					material.map = tex_arr[1];
+					mat_arr[mat_index] = tex_arr[1];
 					tex_arr[0].dispose();
 					tex_arr[2].dispose();
 					tex_arr[3].dispose();
@@ -189,22 +189,22 @@
 
 				const matbtn03 = document.getElementById("3");
 				matbtn03.addEventListener("click",function(){
-					material.map =tex_arr[2];
+					mat_arr[mat_index] =tex_arr[2];
 					tex_arr[0].dispose();
 					tex_arr[1].dispose();
 					tex_arr[3].dispose();
 					tex_arr[2].needsUpdate = true;
-					material.needsUpdate = true;
+					mat_arr[mat_index].needsUpdate = true;
 				});
 
 				const matbtn04 = document.getElementById("4");
 				matbtn04.addEventListener("click",function(){
-					material.map = tex_arr[3];
+					mat_arr[mat_index] = tex_arr[3];
 					tex_arr[0].dispose();
 					tex_arr[1].dispose();
 					tex_arr[2].dispose();
 					tex_arr[3].needsUpdate = true;
-					material.needsUpdate = true;
+					mat_arr[mat_index].needsUpdate = true;
 				});
 
 				//
@@ -216,7 +216,6 @@
 						mesh.visible = true;
 					}
 					else if(reticle.visible && index == 1){
-						mat_index++;
 						const Material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
 						mat_arr.push(Material);
 						mesh = new THREE.Mesh( planegeo, mat_arr[mat_index] );
@@ -232,6 +231,7 @@
 				combtn.addEventListener("click",function(){
 					if(index == 0 ){
 						index++;
+						mat_index++;
 					}
 				});
 				//

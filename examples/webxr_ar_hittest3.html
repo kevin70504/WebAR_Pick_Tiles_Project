@@ -52,10 +52,13 @@
 			let hitTestSource = null;
 			let hitTestSourceRequested = false;
 
-			let texture,texture2,texture3,texture4,mesh;
-			let tex_arr =[];
+			let mesh;
+			let mesh_arr = [];
+			let mesh_index = 0;
+			let texture,texture2,texture3,texture4;
+			let tex_arr = [];
 			let material;
-			let mat_arr =[];
+			let mat_arr = [];
 			let mat_index = 0;
 			let index = 0;
 
@@ -153,7 +156,8 @@
 				mat_arr.push(material);
 				mesh = new THREE.Mesh( planegeo, mat_arr[0]);
 				mesh.visible = false;
-				scene.add( mesh );
+				mesh_arr.push(mesh);
+				scene.add( mesh_arr[0]);
 
 				/*function onSelect() {
 
@@ -211,18 +215,19 @@
 				const setbtn = document.getElementById("place-button");
 				setbtn.addEventListener("click",function(){
 					if ( reticle.visible && index == 0 ) {
-						mesh.position.setFromMatrixPosition( reticle.matrix );
-						mesh.rotation.x = -(Math.PI / 2);
-						mesh.visible = true;
+						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
+						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
+						mesh_arr[mesh_index].visible = true;
 					}
 					else if(reticle.visible && index == 1){
 						const Material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
 						mat_arr.push(Material);
-						mesh = new THREE.Mesh( planegeo, mat_arr[mat_index] );
-						mesh.position.setFromMatrixPosition( reticle.matrix );
-						mesh.rotation.x = -(Math.PI / 2);
-						mesh.visible = true;
-						scene.add( mesh );
+						const Mesh = new THREE.Mesh( planegeo, mat_arr[mat_index] );
+						mesh_arr.push(Mesh);
+						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
+						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
+						mesh_arr[mesh_index].visible = true;
+						scene.add( mesh_arr[mesh_index] );
 						index = 0;
 					}
 				})
@@ -232,6 +237,7 @@
 					if(index == 0 ){
 						index++;
 						mat_index++;
+						mesh_index++;
 					}
 				});
 				//
@@ -297,10 +303,10 @@
 		}
 
 		function scaleObject(){
-			if(mesh && reticle.visible){
-				mesh.scale.x += deltaX / 100;
-				mesh.scale.y += deltaX / 100;
-				mesh.scale.z += deltaX / 100;
+			if(mesh_arr[mesh_index] && reticle.visible){
+				mesh_arr[mesh_index].scale.x += deltaX / 100;
+				mesh_arr[mesh_index].scale.y += deltaX / 100;
+				mesh_arr[mesh_index].scale.z += deltaX / 100;
 
 				if(mat_arr[mat_index].map == tex_arr[0]){
 					//tex_arr[0].repeat.x += deltaX / 100;

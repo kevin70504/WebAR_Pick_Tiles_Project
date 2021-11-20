@@ -267,10 +267,9 @@
 				});
 				//
 
-				/*controller = renderer.xr.getController( 0 );
+				controller = renderer.xr.getController( 0 );
 				controller.addEventListener( 'select', onSelect );
-				controller.addEventListener( 'click', onSelect );
-				scene.add( controller );*/
+				scene.add( controller );
 
 				reticle = new THREE.Mesh(
 					new THREE.RingGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
@@ -303,12 +302,9 @@
 						e.preventDefault();
 						touchDown=true;
 						//透過滑鼠點選的位置計算出 raycaster 所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
-						
-						clickMouse.x = e.touches[0].pageX;
-						clickMouse.y = e.touches[0].pageY;
 
-						//clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-						//clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+						clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+						clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
 						// 透過滑鼠點的位置和當前相機的矩陣計算出 raycaster值
 						raycaster.setFromCamera(clickMouse,camera);
@@ -351,8 +347,27 @@
 						scaleObject();
 
 					}
+					if(modeindex == 1 && reticle.visible == false){
+						e.preventDefault();
+					
+						if(!touchDown){
+							return;
+						}
+						clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+						clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+						// 透過滑鼠點的位置和當前相機的矩陣計算出 raycaster值
+						raycaster.setFromCamera(clickMouse,camera);
+						// 取得 raycaster 射線和所有物件相交的陣列集合
+						const found = raycaster.intersectObjects(scene.children);
+						if(found.length > 0 && found[0].object.userData.draggable){
+							draggable = found[0].object;
+							found[0].object.material.color.set(0x535353);
+							console.log("找到",draggable.userData.name);
+						}
+					}
 				}, false);
-				
+
 				//
 				//選擇模式
 				window.addEventListener("click",event =>{

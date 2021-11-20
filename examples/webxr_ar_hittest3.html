@@ -294,6 +294,22 @@
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
+
+					if(modeindex == 1 &&　reticle.visible == false){
+						//透過滑鼠點選的位置計算出 raycaster 所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
+						clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+						clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+						// 透過滑鼠點的位置和當前相機的矩陣計算出 raycaster值
+						raycaster.setFromCamera(clickMouse,camera);
+						// 取得 raycaster 射線和所有物件相交的陣列集合
+						const found = raycaster.intersectObjects(scene.children);
+						if(found.length > 0 && found[0].object.userData.draggable){
+							draggable = found[0].object;
+							found[0].object.material.color.set(0x535353);
+							console.log("找到",draggable.userData.name);
+						}
+					}
 				}, false);
 
 				renderer.domElement.addEventListener('touchend', function(e){
@@ -302,6 +318,11 @@
 						e.preventDefault();
 						touchDown = false;
 					}
+					if(modeindex == 1 && reticle.visible == false){
+						e.preventDefault();
+						touchDown = false;
+					}
+
 				}, false);
 
 				renderer.domElement.addEventListener('touchmove', function(e){
@@ -325,21 +346,7 @@
 				//
 				//選擇模式
 				window.addEventListener("click",event =>{
-					if(modeindex == 1 &&　reticle.visible == false){
-						//透過滑鼠點選的位置計算出 raycaster 所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
-						clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-						clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-						// 透過滑鼠點的位置和當前相機的矩陣計算出 raycaster值
-						raycaster.setFromCamera(clickMouse,camera);
-						// 取得 raycaster 射線和所有物件相交的陣列集合
-						const found = raycaster.intersectObjects(scene.children);
-						if(found.length > 0 && found[0].object.userData.draggable){
-							draggable = found[0].object;
-							found[0].object.material.color.set(0x535353);
-							console.log("找到",draggable.userData.name);
-						}
-					}
+					
 				});
 	
 				//

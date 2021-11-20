@@ -162,13 +162,12 @@
 				material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
 				mat_arr.push(material);
 				mesh = new THREE.Mesh( planegeo, mat_arr[0]);
+				mesh.userData.draggable = true;
+    			mesh.userData.name = 'Tilies'+ mesh_index;
 				mesh.visible = false;
 				mesh_arr.push(mesh);
-				mesh_arr[0].userData.draggable = true;
-    			mesh_arr[0].userData.name = 'Tilies'+ mesh_index;
 				scene.add( mesh_arr[0]);
 
-				console.log(mat_arr[mat_index]);
 
 				/*function onSelect() {
 
@@ -291,7 +290,7 @@
 				//用單指觸碰
 				
 
-				renderer.domElement.addEventListener('touchstart', function(e){
+				renderer.domElement.addEventListener('touchstart', function(e,event){
 
 					if(modeindex == 0 && reticle.visible == true){
 						e.preventDefault();

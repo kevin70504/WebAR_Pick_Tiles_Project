@@ -324,7 +324,7 @@
 				
 				//
 				//選擇模式
-				renderer.domElement.addEventListener("click",event =>{
+				window.addEventListener("click",event =>{
 					if(modeindex == 1 &&　reticle.visible == false){
 						//透過滑鼠點選的位置計算出 raycaster 所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
 						clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;

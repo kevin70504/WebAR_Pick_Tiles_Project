@@ -296,6 +296,8 @@
 					}
 
 					if(modeindex == 1 &&　reticle.visible == false){
+						e.preventDefault();
+						touchDown=true;
 						//透過滑鼠點選的位置計算出 raycaster 所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
 						clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 						clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;

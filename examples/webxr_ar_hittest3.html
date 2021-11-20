@@ -164,6 +164,8 @@
 				mesh = new THREE.Mesh( planegeo, mat_arr[0]);
 				mesh.visible = false;
 				mesh_arr.push(mesh);
+				mesh_arr[0].userData.draggable = true;
+    			mesh_arr[0].userData.name = 'Tilies'+ mesh_index;
 				scene.add( mesh_arr[0]);
 
 				console.log(mat_arr[mat_index]);
@@ -227,6 +229,7 @@
 						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
 						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
 						mesh_arr[mesh_index].visible = true;
+
 					}
 					else if(reticle.visible && index == 1 && modeindex == 0){
 						const Material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
@@ -236,6 +239,8 @@
 						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
 						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
 						mesh_arr[mesh_index].visible = true;
+						mesh_arr[mesh_index].userData.draggable = true;
+    					mesh_arr[mesh_index].userData.name = 'Tilies'+ mesh_index;
 						scene.add( mesh_arr[mesh_index] );
 						index = 0;
 					}
@@ -299,6 +304,10 @@
 						e.preventDefault();
 						touchDown=true;
 						//透過滑鼠點選的位置計算出 raycaster 所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
+						
+						//clickMouse.x = e.touches[0].pageX;
+						//clickMouse.y = e.touches[0].pageY;
+
 						clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 						clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 

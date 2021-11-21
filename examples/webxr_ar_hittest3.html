@@ -199,37 +199,37 @@
 					}
 
 					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						target.material.map = tex_Arr[0];
+						mesh_arr[0].material.map = tex_Arr[0];
 						tex_arr[1].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
 						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[0].needsUpdate = true;
 					}
 
 					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						target.material.map = tex_Arr[0];
+						mesh_arr[1].material.map = tex_Arr[0];
 						tex_arr[1].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
 						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[1].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						target.material.map = tex_Arr[0];
+						mesh_arr[2].material.map = tex_Arr[0];
 						tex_arr[1].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
 						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[2].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						target.material.map = tex_Arr[0];
+						mesh_arr[3].material.map = tex_Arr[0];
 						tex_arr[1].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
 						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[3].needsUpdate = true;
 					}
 				});
 
@@ -245,37 +245,37 @@
 					}
 
 					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						target.material.map = tex_Arr[1];
+						mesh_arr[0].material.map = tex_Arr[1];
 						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
 						tex_arr[1].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[0].needsUpdate = true;
 					}
 
 					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						target.material.map = tex_arr[1];
+						mesh_arr[1].material.map = tex_arr[1];
 						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
 						tex_arr[1].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[1].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						target.material.map = tex_arr[1];
-						tex_arr[1].dispose();
+						mesh_arr[2].material.map = tex_arr[1];
+						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						tex_arr[1].needsUpdate = true;
+						mesh_arr[2].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						target.material.map = tex_arr[1];
-						tex_arr[1].dispose();
+						mesh_arr[3].material.map = tex_arr[1];
+						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						tex_arr[1].needsUpdate = true;
+						mesh_arr[3].needsUpdate = true;
 					}
 
 				});
@@ -291,37 +291,37 @@
 						mat_arr[mat_index].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						target.material.map = tex_arr[2];
+						mesh_arr[0].material.map = tex_arr[2];
 						tex_arr[0].dispose();
-						tex_arr[2].dispose();
+						tex_arr[1].dispose();
 						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						material.needsUpdate = true;
+						tex_arr[2].needsUpdate = true;
+						mesh_arr[0].needsUpdate = true;
 					}
 
 					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						target.material.map = tex_arr[2];
+						mesh_arr[1].material.map = tex_arr[2];
 						tex_arr[0].dispose();
-						tex_arr[2].dispose();
+						tex_arr[1].dispose();
 						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						material.needsUpdate = true;
+						tex_arr[2].needsUpdate = true;
+						mesh_arr[1].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						target.material.map = tex_arr[2];
+						mesh_arr[2].material.map = tex_arr[2];
+						tex_arr[0].dispose();
 						tex_arr[1].dispose();
-						tex_arr[2].dispose();
 						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						tex_arr[2].needsUpdate = true;
+						mesh_arr[2].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						target.material.map = tex_arr[2];
+						mesh_arr[3].material.map = tex_arr[2];
+						tex_arr[0].dispose();
 						tex_arr[1].dispose();
-						tex_arr[2].dispose();
 						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						tex_arr[2].needsUpdate = true;
+						mesh_arr[3].needsUpdate = true;
 					}
 
 				});
@@ -337,36 +337,36 @@
 						mat_arr[mat_index].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						target.material.map = tex_arr[3];
+						mesh_arr[0].material.map = tex_arr[3];
 						tex_arr[0].dispose();
+						tex_arr[1].dispose();
 						tex_arr[2].dispose();
-						tex_arr[3].dispose();
 						tex_arr[3].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[0].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						target.material.map = tex_arr[3];
+						mesh_arr[1].material.map = tex_arr[3];
 						tex_arr[0].dispose();
+						tex_arr[1].dispose();
 						tex_arr[2].dispose();
-						tex_arr[3].dispose();
 						tex_arr[3].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[1].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						target.material.map = tex_arr[3];
+						mesh_arr[2].material.map = tex_arr[3];
 						tex_arr[0].dispose();
+						tex_arr[1].dispose();
 						tex_arr[2].dispose();
-						tex_arr[3].dispose();
 						tex_arr[3].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[2].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						target.material.map = tex_arr[3];
+						mesh_arr[3].material.map = tex_arr[3];
 						tex_arr[0].dispose();
+						tex_arr[1].dispose();
 						tex_arr[2].dispose();
-						tex_arr[3].dispose();
 						tex_arr[3].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
+						mesh_arr[3].needsUpdate = true;
 					}
 				});
 
@@ -590,6 +590,44 @@
 
 		function scaleObject(){
 			if(mesh_arr[mesh_index] && reticle.visible){
+				mesh_arr[mesh_index].scale.x += deltaX / 100;
+				mesh_arr[mesh_index].scale.y += deltaX / 100;
+				mesh_arr[mesh_index].scale.z += deltaX / 100;
+
+				if(mat_arr[mat_index].map == tex_arr[0]){
+					//tex_arr[0].repeat.x += deltaX / 100;
+					//tex_arr[0].repeat.y += deltaX / 100;
+					mat_arr[mat_index].map.repeat.x += deltaX / 100;
+					mat_arr[mat_index].map.repeat.y += deltaX / 100;
+					//tex_arr[0].needsUpdate = true;
+					mat_arr[mat_index].needsUpdate = true;
+				}
+				else if((mat_arr[mat_index].map == tex_arr[1])){
+					//tex_arr[1].repeat.x += deltaX / 100;
+        			//tex_arr[1].repeat.y += deltaX / 100;
+					mat_arr[mat_index].map.repeat.x += deltaX / 100;
+					mat_arr[mat_index].map.repeat.y += deltaX / 100;
+					//tex_arr[1].needsUpdate = true;
+					mat_arr[mat_index].needsUpdate = true;
+				}
+				else if((material.map == tex_arr[2])){
+					tex_arr[2].repeat.x += deltaX / 100;
+        			tex_arr[2].repeat.y += deltaX / 100;
+					material.map.repeat.x += deltaX / 100;
+					material.map.repeat.y += deltaX / 100;
+					tex_arr[2].needsUpdate = true;
+					material.needsUpdate = true;
+				}
+				else{
+					tex_arr[3].repeat.x += deltaX / 100;
+        			tex_arr[3].repeat.y += deltaX / 100;
+					material.map.repeat.x += deltaX / 100;
+					material.map.repeat.y += deltaX / 100;
+					tex_arr[3].needsUpdate = true;
+					material.needsUpdate = true;
+				}
+			}
+			else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name && reticle.visible == false){
 				mesh_arr[mesh_index].scale.x += deltaX / 100;
 				mesh_arr[mesh_index].scale.y += deltaX / 100;
 				mesh_arr[mesh_index].scale.z += deltaX / 100;

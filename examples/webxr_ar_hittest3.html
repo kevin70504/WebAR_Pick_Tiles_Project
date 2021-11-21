@@ -377,8 +377,8 @@
 					if(modeindex == 0 ){
 						modeindex++;
 						reticle.visible = false;
-						Mesh_Arr[0].material.color.set(0x535353);
-						target = Mesh_Arr[index];
+						mesh_arr[0].material.color.set(0x535353);
+						target = mesh_arr[index];
 						click_text.style.display = "block";
 						btn_left.style.display = "block";
 					}
@@ -387,8 +387,8 @@
 						reticle.visible = true;
 						click_text.style.display = "none";
 						btn_left.style.display = "none";
-						for (let i = 0; i < Mesh_Arr.length; i++) {
-							Mesh_Arr[i].material.color.set(0xffffff);               
+						for (let i = 0; i < mesh_arr.length; i++) {
+							mesh_arr[i].material.color.set(0xffffff);               
 						}
 					}
 				});
@@ -396,27 +396,27 @@
 					btn_left.addEventListener("click",function(){
 					if(target_index == 0 && modeindex==1){
 						target_index++;
-						target = Mesh_Arr[index];
+						target = mesh_arr[index];
 						target.material.color.set(0x535353);
 					}
 					else if(target_index == 1 && modeindex==1){
 						target_index++;
-						target = Mesh_Arr[index];
+						target = mesh_arr[index];
 						target.material.color.set(0x535353);
 					}
 					else if(target_index == 2 && modeindex==1){
 						target_index = 0;
-						target = Mesh_Arr[index];
+						target = mesh_arr[index];
 						target.material.color.set(0x535353);
 					}
-					if(target != Mesh_Arr[0]){
-						Mesh_Arr[0].material.color.set(0xffffff);    
+					if(target != mesh_arr[0]){
+						mesh_arr[0].material.color.set(0xffffff);    
 					}
-					if(target != Mesh_Arr[1]){
-						Mesh_Arr[1].material.color.set(0xffffff);    
+					if(target != mesh_arr[1]){
+						mesh_arr[1].material.color.set(0xffffff);    
 					}
-					if(target != Mesh_Arr[2]){
-						Mesh_Arr[2].material.color.set(0xffffff);    
+					if(target != mesh_arr[2]){
+						mesh_arr[2].material.color.set(0xffffff);    
 					}   
 				});
 

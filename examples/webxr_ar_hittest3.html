@@ -486,13 +486,13 @@
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					else if(modeindex == 1 && target == mesh_arr[1]&&reticle.visible == false){
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name &&reticle.visible == false){
 						e.preventDefault();
 						touchDown=true;
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					else if(modeindex == 1 && target == mesh_arr[2]&&reticle.visible == false){
+					else if(modeindex == 1 && targettarget.userData.name == mesh_arr[2].userData.name &&reticle.visible == false){
 						e.preventDefault();
 						touchDown=true;
 						touchX = e.touches[0].pageX;
@@ -507,11 +507,11 @@
 						touchDown = false;
 					}
 
-					else if(modeindex == 1 && target == mesh_arr[1]&& reticle.visible == false){
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name && reticle.visible == false){
 						e.preventDefault();
 						touchDown = false;
 					}
-					else if(modeindex == 1 && target == mesh_arr[2]&& reticle.visible == false){
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name && reticle.visible == false){
 						e.preventDefault();
 						touchDown = false;
 					}
@@ -535,7 +535,7 @@
 
 					}
 
-					else if(modeindex == 1 && target == mesh_arr[1]&&reticle.visible == false){
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name &&reticle.visible == false){
 						e.preventDefault();
 					
 						if(!touchDown){
@@ -551,7 +551,7 @@
 
 					}
 
-					else if(modeindex == 1 && target == mesh_arr[2]&&reticle.visible == false){
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name &&reticle.visible == false){
 						e.preventDefault();
 					
 						if(!touchDown){

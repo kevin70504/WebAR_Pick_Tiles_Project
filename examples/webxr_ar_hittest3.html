@@ -397,17 +397,17 @@
 					btn_left.addEventListener("click",function(){
 					if(mode01_index == 0 && modeindex==1){
 						mode01_index++;
-						target = mesh_arr[mesh_index];
+						target = mesh_arr[mode01_index];
 						target.material.color.set(0x535353);
 					}
 					else if(mode01_index == 1 && modeindex==1){
 						mode01_index++;
-						target = mesh_arr[mesh_index];
+						target = mesh_arr[mode01_index];
 						target.material.color.set(0x535353);
 					}
 					else if(mode01_index == 2 && modeindex==1){
 						mode01_index = 0;
-						target = mesh_arr[mesh_index];
+						target = mesh_arr[mode01_index];
 						target.material.color.set(0x535353);
 					}
 					if(target != mesh_arr[0]){

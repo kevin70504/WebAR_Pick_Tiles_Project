@@ -447,19 +447,19 @@
 
 				renderer.domElement.addEventListener('touchstart', function(e,event){
 
-					if(modeindex == 0 && mesh_arr[0] &&reticle.visible == true){
+					if(modeindex == 0 && target == mesh_arr[0] && reticle.visible == true){
 						e.preventDefault();
 						touchDown=true;
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					else if(modeindex == 0 && mesh_arr[1]&&reticle.visible == true){
+					else if(modeindex == 0 && target == mesh_arr[1]&&reticle.visible == true){
 						e.preventDefault();
 						touchDown=true;
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					else if(modeindex == 0 && mesh_arr[2]&&reticle.visible == true){
+					else if(modeindex == 0 && target == mesh_arr[2]&&reticle.visible == true){
 						e.preventDefault();
 						touchDown=true;
 						touchX = e.touches[0].pageX;
@@ -469,16 +469,16 @@
 
 				renderer.domElement.addEventListener('touchend', function(e){
 
-					if(modeindex == 0 && mesh_arr[0] && reticle.visible == true){
+					if(modeindex == 0 && target == mesh_arr[0] && reticle.visible == true){
 						e.preventDefault();
 						touchDown = false;
 					}
 
-					else if(modeindex == 0 && mesh_arr[1]&& reticle.visible == true){
+					else if(modeindex == 0 && target == mesh_arr[1]&& reticle.visible == true){
 						e.preventDefault();
 						touchDown = false;
 					}
-					else if(modeindex == 0 && mesh_arr[2]&& reticle.visible == true){
+					else if(modeindex == 0 && target == mesh_arr[2]&& reticle.visible == true){
 						e.preventDefault();
 						touchDown = false;
 					}
@@ -486,7 +486,7 @@
 				}, false);
 
 				renderer.domElement.addEventListener('touchmove', function(e){
-					if(modeindex == 0 && mesh_arr[0] && reticle.visible == true){
+					if(modeindex == 0 && target == mesh_arr[0] && reticle.visible == true){
 						e.preventDefault();
 					
 						if(!touchDown){
@@ -502,7 +502,7 @@
 
 					}
 
-					else if(modeindex == 0 && mesh_arr[1]&&reticle.visible == true){
+					else if(modeindex == 0 && target == mesh_arr[1]&&reticle.visible == true){
 						e.preventDefault();
 					
 						if(!touchDown){
@@ -518,7 +518,7 @@
 
 					}
 
-					else if(modeindex == 0 && mesh_arr[2]&&reticle.visible == true){
+					else if(modeindex == 0 && target == mesh_arr[2]&&reticle.visible == true){
 						e.preventDefault();
 					
 						if(!touchDown){

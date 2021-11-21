@@ -24,6 +24,8 @@
 		<button type="button" id="place-button">PLACE</button>
 		<button type="button" id="complete-button">Complete</button>
 		<button type="button" id="mode01-button">Select Mode</button>
+		<button type="button" id="left">Change</button>
+		<div id="text">Click Mode Open</div>
 
 		</div>
 
@@ -67,6 +69,8 @@
 			let raycaster = new THREE.Raycaster();
 			let clickMouse = new THREE.Vector2();
 			let draggable = THREE.Object3D;
+
+			let target = THREE.Object3D;
 
 
 			init();
@@ -183,42 +187,152 @@
 
 				const matbtn01 = document.getElementById("1");
 				matbtn01.addEventListener("click",function(){
-					mat_arr[mat_index].map = tex_arr[0];
-					tex_arr[1].dispose();
-					tex_arr[2].dispose();
-					tex_arr[3].dispose();
-					tex_arr[0].needsUpdate = true;
-					mat_arr[mat_index].needsUpdate = true;
+					if(modeindex == 0){
+						mat_arr[mat_index].map = tex_arr[0];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
+						target.material.map = tex_Arr[0];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
+						target.material.map = tex_Arr[0];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
+						target.material.map = tex_Arr[0];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
 				});
 
 				const matbtn02 = document.getElementById("2");
 				matbtn02.addEventListener("click",function(){
-					mat_arr[mat_index].map = tex_arr[1];
-					tex_arr[0].dispose();
-					tex_arr[2].dispose();
-					tex_arr[3].dispose();
-					tex_arr[1].needsUpdate = true;
-					material.needsUpdate = true;
+					if(modeindex == 0){
+						mat_arr[mat_index].map = tex_arr[1];
+						tex_arr[0].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[1].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
+						target.material.map = tex_arr[1];
+						tex_arr[0].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[1].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
+						target.material.map = tex_arr[1];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
+						target.material.map = tex_arr[1];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+
 				});
 
 				const matbtn03 = document.getElementById("3");
 				matbtn03.addEventListener("click",function(){
-					mat_arr[mat_index].map =tex_arr[2];
-					tex_arr[0].dispose();
-					tex_arr[1].dispose();
-					tex_arr[3].dispose();
-					tex_arr[2].needsUpdate = true;
-					mat_arr[mat_index].needsUpdate = true;
+					if(modeindex == 0){
+						mat_arr[mat_index].map =tex_arr[2];
+						tex_arr[0].dispose();
+						tex_arr[1].dispose();
+						tex_arr[3].dispose();
+						tex_arr[2].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
+						target.material.map = tex_arr[2];
+						tex_arr[0].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[1].needsUpdate = true;
+						material.needsUpdate = true;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
+						target.material.map = tex_arr[2];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
+						target.material.map = tex_arr[2];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+
 				});
 
 				const matbtn04 = document.getElementById("4");
 				matbtn04.addEventListener("click",function(){
-					mat_arr[mat_index].map = tex_arr[3];
-					tex_arr[0].dispose();
-					tex_arr[1].dispose();
-					tex_arr[2].dispose();
-					tex_arr[3].needsUpdate = true;
-					mat_arr[mat_index].needsUpdate = true;
+					if(modeindex == 0){
+						mat_arr[mat_index].map = tex_arr[3];
+						tex_arr[0].dispose();
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
+						target.material.map = tex_arr[3];
+						tex_arr[0].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[1].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
+						target.material.map = tex_arr[3];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
+						target.material.map = tex_arr[3];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
 				});
 
 				//
@@ -257,12 +371,24 @@
 				//
 				const mode01btn = document.getElementById("mode01-button")
 				mode01btn.addEventListener("click",function(){
+					const click_text = document.getElementById("text");
+					const btn_left = document.getElementById("left");
 					if(modeindex == 0 ){
 						modeindex++;
 						reticle.visible = false;
+						Mesh_Arr[0].material.color.set(0x535353);
+						target = Mesh_Arr[index];
+						click_text.style.display = "block";
+						btn_left.style.display = "block";
 					}
 					else{
 						modeindex = 0;
+						reticle.visible = true;
+						click_text.style.display = "none";
+						btn_left.style.display = "none";
+						for (let i = 0; i < Mesh_Arr.length; i++) {
+							Mesh_Arr[i].material.color.set(0xffffff);               
+						}
 					}
 				});
 				//

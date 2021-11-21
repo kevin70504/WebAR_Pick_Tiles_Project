@@ -378,7 +378,7 @@
 						modeindex++;
 						reticle.visible = false;
 						mesh_arr[0].material.color.set(0x535353);
-						target = mesh_arr[index];
+						target = mesh_arr[mesh_index];
 						click_text.style.display = "block";
 						btn_left.style.display = "block";
 					}
@@ -396,17 +396,17 @@
 					btn_left.addEventListener("click",function(){
 					if(target_index == 0 && modeindex==1){
 						target_index++;
-						target = mesh_arr[index];
+						target = mesh_arr[mesh_index];
 						target.material.color.set(0x535353);
 					}
 					else if(target_index == 1 && modeindex==1){
 						target_index++;
-						target = mesh_arr[index];
+						target = mesh_arr[mesh_index];
 						target.material.color.set(0x535353);
 					}
 					else if(target_index == 2 && modeindex==1){
 						target_index = 0;
-						target = mesh_arr[index];
+						target = mesh_arr[mesh_index];
 						target.material.color.set(0x535353);
 					}
 					if(target != mesh_arr[0]){

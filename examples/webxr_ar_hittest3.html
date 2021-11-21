@@ -394,17 +394,17 @@
 				});
 				const btn_left = document.getElementById("left");
 					btn_left.addEventListener("click",function(){
-					if(target_index == 0 && mode01_index==1){
+					if(target_index == 0 && modeindex==1){
 						target_index++;
 						target = Mesh_Arr[index];
 						target.material.color.set(0x535353);
 					}
-					else if(target_index == 1 && mode01_index==1){
+					else if(target_index == 1 && modeindex==1){
 						target_index++;
 						target = Mesh_Arr[index];
 						target.material.color.set(0x535353);
 					}
-					else if(target_index == 2 && mode01_index==1){
+					else if(target_index == 2 && modeindex==1){
 						target_index = 0;
 						target = Mesh_Arr[index];
 						target.material.color.set(0x535353);

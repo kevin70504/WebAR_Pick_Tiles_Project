@@ -198,6 +198,15 @@
 						mat_arr[mat_index].needsUpdate = true;
 					}
 
+					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
+						target.material.map = tex_Arr[0];
+						tex_arr[1].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[0].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+
 					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
 						target.material.map = tex_Arr[0];
 						tex_arr[1].dispose();
@@ -228,6 +237,15 @@
 				matbtn02.addEventListener("click",function(){
 					if(modeindex == 0){
 						mat_arr[mat_index].map = tex_arr[1];
+						tex_arr[0].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[1].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
+
+					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
+						target.material.map = tex_Arr[1];
 						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
@@ -272,6 +290,14 @@
 						tex_arr[2].needsUpdate = true;
 						mat_arr[mat_index].needsUpdate = true;
 					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
+						target.material.map = tex_arr[2];
+						tex_arr[0].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[1].needsUpdate = true;
+						material.needsUpdate = true;
+					}
 
 					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
 						target.material.map = tex_arr[2];
@@ -310,29 +336,36 @@
 						tex_arr[3].needsUpdate = true;
 						mat_arr[mat_index].needsUpdate = true;
 					}
-
+					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
+						target.material.map = tex_arr[3];
+						tex_arr[0].dispose();
+						tex_arr[2].dispose();
+						tex_arr[3].dispose();
+						tex_arr[3].needsUpdate = true;
+						mat_arr[mat_index].needsUpdate = true;
+					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
 						target.material.map = tex_arr[3];
 						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
+						tex_arr[3].needsUpdate = true;
 						mat_arr[mat_index].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
 						target.material.map = tex_arr[3];
-						tex_arr[1].dispose();
+						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
+						tex_arr[3].needsUpdate = true;
 						mat_arr[mat_index].needsUpdate = true;
 					}
 					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
 						target.material.map = tex_arr[3];
-						tex_arr[1].dispose();
+						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
+						tex_arr[3].needsUpdate = true;
 						mat_arr[mat_index].needsUpdate = true;
 					}
 				});
@@ -453,13 +486,13 @@
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					else if(modeindex == 0 && target == mesh_arr[1]&&reticle.visible == true){
+					else if(modeindex == 1 && target == mesh_arr[1]&&reticle.visible == false){
 						e.preventDefault();
 						touchDown=true;
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					else if(modeindex == 0 && target == mesh_arr[2]&&reticle.visible == true){
+					else if(modeindex == 1 && target == mesh_arr[2]&&reticle.visible == false){
 						e.preventDefault();
 						touchDown=true;
 						touchX = e.touches[0].pageX;
@@ -474,11 +507,11 @@
 						touchDown = false;
 					}
 
-					else if(modeindex == 0 && target == mesh_arr[1]&& reticle.visible == true){
+					else if(modeindex == 1 && target == mesh_arr[1]&& reticle.visible == false){
 						e.preventDefault();
 						touchDown = false;
 					}
-					else if(modeindex == 0 && target == mesh_arr[2]&& reticle.visible == true){
+					else if(modeindex == 1 && target == mesh_arr[2]&& reticle.visible == false){
 						e.preventDefault();
 						touchDown = false;
 					}
@@ -502,7 +535,7 @@
 
 					}
 
-					else if(modeindex == 0 && target == mesh_arr[1]&&reticle.visible == true){
+					else if(modeindex == 1 && target == mesh_arr[1]&&reticle.visible == false){
 						e.preventDefault();
 					
 						if(!touchDown){
@@ -518,7 +551,7 @@
 
 					}
 
-					else if(modeindex == 0 && target == mesh_arr[2]&&reticle.visible == true){
+					else if(modeindex == 1 && target == mesh_arr[2]&&reticle.visible == false){
 						e.preventDefault();
 					
 						if(!touchDown){

@@ -65,6 +65,7 @@
 			let mat_index = 0;
 			let index = 0;
 			let modeindex = 0;
+			let target_index = 0;
 
 			let raycaster = new THREE.Raycaster();
 			let clickMouse = new THREE.Vector2();
@@ -391,6 +392,34 @@
 						}
 					}
 				});
+				const btn_left = document.getElementById("left");
+					btn_left.addEventListener("click",function(){
+					if(target_index == 0 && mode01_index==1){
+						target_index++;
+						target = Mesh_Arr[index];
+						target.material.color.set(0x535353);
+					}
+					else if(target_index == 1 && mode01_index==1){
+						target_index++;
+						target = Mesh_Arr[index];
+						target.material.color.set(0x535353);
+					}
+					else if(target_index == 2 && mode01_index==1){
+						target_index = 0;
+						target = Mesh_Arr[index];
+						target.material.color.set(0x535353);
+					}
+					if(target != Mesh_Arr[0]){
+						Mesh_Arr[0].material.color.set(0xffffff);    
+					}
+					if(target != Mesh_Arr[1]){
+						Mesh_Arr[1].material.color.set(0xffffff);    
+					}
+					if(target != Mesh_Arr[2]){
+						Mesh_Arr[2].material.color.set(0xffffff);    
+					}   
+				});
+
 				//
 
 				/*controller = renderer.xr.getController( 0 );

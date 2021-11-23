@@ -478,7 +478,7 @@
 				//用單指觸碰
 				
 
-				renderer.domElement.addEventListener('touchstart', function(e,event){
+				renderer.domElement.addEventListener('touchstart', function(e){
 
 					if(modeindex == 0 && reticle.visible == true){
 						e.preventDefault();
@@ -492,7 +492,19 @@
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					else if(modeindex == 1 && targettarget.userData.name == mesh_arr[1].userData.name &&reticle.visible == false){
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name &&reticle.visible == false){
+						e.preventDefault();
+						touchDown=true;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name &&reticle.visible == false){
+						e.preventDefault();
+						touchDown=true;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name &&reticle.visible == false){
 						e.preventDefault();
 						touchDown=true;
 						touchX = e.touches[0].pageX;
@@ -515,6 +527,15 @@
 						e.preventDefault();
 						touchDown = false;
 					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name && reticle.visible == false){
+						e.preventDefault();
+						touchDown = false;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name && reticle.visible == false){
+						e.preventDefault();
+						touchDown = false;
+					}
+
 
 				}, false);
 
@@ -598,7 +619,6 @@
 						Mode01_scaleObject(3);
 
 					}
-
 				}, false);
 
 				//
@@ -664,46 +684,44 @@
 
 			//
 		function Mode01_scaleObject(a){
-			if(modeindex == 1 && target.userData.name == mesh_arr[a].userData.name && reticle.visible == false){
+
 			mesh_arr[a].scale.x += deltaX / 100;
 			mesh_arr[a].scale.y += deltaX / 100;
 			mesh_arr[a].scale.z += deltaX / 100;
 
-			if(mat_arr[a].map == tex_arr[0]){
-				//tex_arr[0].repeat.x += deltaX / 100;
-				//tex_arr[0].repeat.y += deltaX / 100;
-				mat_arr[a].map.repeat.x += deltaX / 100;
-				mat_arr[a].map.repeat.y += deltaX / 100;
-				//tex_arr[0].needsUpdate = true;
-				mat_arr[a].needsUpdate = true;
-			}
-			else if((mat_arr[a].map == tex_arr[1])){
-				//tex_arr[1].repeat.x += deltaX / 100;
-				//tex_arr[1].repeat.y += deltaX / 100;
-				mat_arr[a].map.repeat.x += deltaX / 100;
-				mat_arr[a].map.repeat.y += deltaX / 100;
-				//tex_arr[1].needsUpdate = true;
-				mat_arr[a].needsUpdate = true;
-			}
-			else if((mat_arr[a].map == tex_arr[2])){
-				//tex_arr[2].repeat.x += deltaX / 100;
-				//tex_arr[2].repeat.y += deltaX / 100;
-				mat_arr[a].map.repeat.x += deltaX / 100;
-				mat_arr[a].map.repeat.y += deltaX / 100;
-				//tex_arr[2].needsUpdate = true;
-				mat_arr[a].needsUpdate = true;
-			}
-			else{
-				//tex_arr[3].repeat.x += deltaX / 100;
-				//tex_arr[3].repeat.y += deltaX / 100;
-				mat_arr[a].map.repeat.x += deltaX / 100;
-				mat_arr[a].map.repeat.y += deltaX / 100;
-				//tex_arr[3].needsUpdate = true;
-				mat_arr[a].needsUpdate = true;
-			}
+				if(mat_arr[a].map == tex_arr[0]){
+					//tex_arr[0].repeat.x += deltaX / 100;
+					//tex_arr[0].repeat.y += deltaX / 100;
+					mat_arr[a].map.repeat.x += deltaX / 100;
+					mat_arr[a].map.repeat.y += deltaX / 100;
+					//tex_arr[0].needsUpdate = true;
+					mat_arr[a].needsUpdate = true;
+				}
+				else if((mat_arr[a].map == tex_arr[1])){
+					//tex_arr[1].repeat.x += deltaX / 100;
+					//tex_arr[1].repeat.y += deltaX / 100;
+					mat_arr[a].map.repeat.x += deltaX / 100;
+					mat_arr[a].map.repeat.y += deltaX / 100;
+					//tex_arr[1].needsUpdate = true;
+					mat_arr[a].needsUpdate = true;
+				}
+				else if((mat_arr[a].map == tex_arr[2])){
+					//tex_arr[2].repeat.x += deltaX / 100;
+					//tex_arr[2].repeat.y += deltaX / 100;
+					mat_arr[a].map.repeat.x += deltaX / 100;
+					mat_arr[a].map.repeat.y += deltaX / 100;
+					//tex_arr[2].needsUpdate = true;
+					mat_arr[a].needsUpdate = true;
+				}
+				else{
+					//tex_arr[3].repeat.x += deltaX / 100;
+					//tex_arr[3].repeat.y += deltaX / 100;
+					mat_arr[a].map.repeat.x += deltaX / 100;
+					mat_arr[a].map.repeat.y += deltaX / 100;
+					//tex_arr[3].needsUpdate = true;
+					mat_arr[a].needsUpdate = true;
+				}
 		}
-
-			}
 			//
 
 			function onWindowResize() {

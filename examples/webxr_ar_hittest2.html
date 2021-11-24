@@ -27,6 +27,10 @@
 
 			let hitTestSource = null;
 			let hitTestSourceRequested = false;
+			let arrow ;
+			let raycaster = new THREE.Raycaster();
+			var cameraPostion = new THREE.Vector3();
+			var cameraDirection = new THREE.Vector3();
 
 			init();
 			animate();
@@ -69,11 +73,12 @@
 				mesh.userData.name = 'BOX';
 
 
-				const raycaster = new THREE.Raycaster();
 				const clickMouse = new THREE.Vector2();
 				const moveMouse = new THREE.Vector2();
 				var draggable = THREE.Object3D;
 				let target;
+				arrow = new THREE.ArrowHelper( raycaster.ray.direction, raycaster.ray.origin, 100, Math.random() * 0xffffff );
+				scene.add( arrow );
 
 				function onSelect(event) {
 
@@ -90,24 +95,20 @@
 						console.log(mesh.position);
 
 					}*/
-				}
-				renderer.domElement.addEventListener('click',function(event){
-					clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-					clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-					// 透過滑鼠點的位置和當前相機的矩陣計算出 raycaster值
-					raycaster.setFromCamera(clickMouse,camera);
-					// 取得 raycaster 射線和所有物件相交的陣列集合
+					//event.preventDefault();
+					clickMouse.x = +(event.targetTouches[0].pageX / window.innerWidth) * 2 +-1;
+        			clickMouse.y = -(event.targetTouches[0].pageY / window.innerHeight) * 2 + 1;
+					raycaster.setFromCamera(clickMouse, camera);
 					const found = raycaster.intersectObjects(scene.children);
 					if(found.length > 0 && found[0].object.userData.draggable){
-						draggable = found[0].object;
-						draggable.material.color.set(0x535353);
-					}		
-
-				},false)
+					draggable = found[0].object;
+					draggable.object.material.color.set(0x535353);
+					console.log("找到",draggable.userData.name);
+				}
+			}
 
 				/*controller = renderer.xr.getController( 0 );
-				controller.addEventListener( 'select', onSelect );
+				controller.addEventListener( 'select', onSelect, false);
 				scene.add( controller );*/
 
 				/*reticle = new THREE.Mesh(
@@ -128,6 +129,21 @@
 
 				window.addEventListener( 'resize', onWindowResize,false );
 
+				renderer.domElement.addEventListener('touchend', function(e){
+
+					e.preventDefault();
+					clickMouse.x = +(e.targetTouches[0].pageX / window.innerWidth) * 2 +-1;
+        			clickMouse.y = -(e.targetTouches[0].pageY / window.innerHeight) * 2 + 1;
+					raycaster.setFromCamera(clickMouse, camera);
+					const found = raycaster.intersectObjects(scene.children);
+					if(found.length > 0 && found[0].object.userData.draggable){
+					draggable = found[0].object;
+					draggable.material.color.set(0x535353);
+					console.log("找到",draggable.userData.name);
+				}
+					
+				}, false);
+
 			}
 
 			function onWindowResize() {
@@ -142,10 +158,8 @@
 			//
 
 			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
+		renderer.setAnimationLoop( render );
+	}
 
 			function render( timestamp, frame ) {
 

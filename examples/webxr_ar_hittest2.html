@@ -126,19 +126,15 @@
 
 				window.addEventListener( 'resize', onWindowResize,false );
 
-				renderer.domElement.addEventListener('touchend', function(e){
+				renderer.domElement.addEventListener('touchstart', function(e){
 
 					e.preventDefault();
 					clickMouse.x = +(e.targetTouches[0].pageX / window.innerWidth) * 2 +-1;
         			clickMouse.y = -(e.targetTouches[0].pageY / window.innerHeight) * 2 + 1;
 					projector.unprojectVector( clickMouse, camera );
 					const raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize());
-					const found = raycaster.intersectObjects(scene.children);
-					if(found.length > 0 && found[0].object.userData.draggable){
-					draggable = found[0].object;
-					draggable.material.color.set(0x535353);
-					console.log("找到",draggable.userData.name);
-				}
+					const found = raycaster.intersectObjects(mesh);
+					mesh.material.color.set(0x535353);
 					
 				}, false);
 

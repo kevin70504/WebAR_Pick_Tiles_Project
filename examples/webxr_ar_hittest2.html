@@ -30,8 +30,6 @@
 			let arrow ;
 			var cameraPostion = new THREE.Vector3();
 			var cameraDirection = new THREE.Vector3();
-			let raycaster = new THREE.Raycaster(camera.getWorldPosition(cameraPostion), camera.getWorldDirection(cameraDirection));
-
 
 			init();
 			animate();
@@ -135,7 +133,8 @@
 					e.preventDefault();
 					clickMouse.x = +(e.targetTouches[0].pageX / window.innerWidth) * 2 +-1;
         			clickMouse.y = -(e.targetTouches[0].pageY / window.innerHeight) * 2 + 1;
-					raycaster.setFromCamera(clickMouse, camera);
+					projector.unprojectVector( clickMouse, camera );
+					const raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize());
 					const found = raycaster.intersectObjects(scene.children);
 					if(found.length > 0 && found[0].object.userData.draggable){
 					draggable = found[0].object;

@@ -28,9 +28,10 @@
 			let hitTestSource = null;
 			let hitTestSourceRequested = false;
 			let arrow ;
-			let raycaster = new THREE.Raycaster();
 			var cameraPostion = new THREE.Vector3();
 			var cameraDirection = new THREE.Vector3();
+			let raycaster = new THREE.Raycaster(camera.getWorldPosition(cameraPostion), camera.getWorldDirection(cameraDirection));
+
 
 			init();
 			animate();

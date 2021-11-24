@@ -129,13 +129,15 @@
 				renderer.domElement.addEventListener('touchstart', function(e){
 
 					e.preventDefault();
-					clickMouse.x = +(e.targetTouches[0].pageX / window.innerWidth) * 2 +-1;
-        			clickMouse.y = -(e.targetTouches[0].pageY / window.innerHeight) * 2 + 1;
-					projector.unprojectVector( clickMouse, camera );
+					clickMouse.x = (e.touches[0].pageX / window.innerWidth) * 2 - 1;
+        			clickMouse.y = -(e.touches[0].pageY / window.innerHeight) * 2 + 1;
+					var vector = new THREE.Vector3( clickMouse.x, clickMouse.y, 1 );
+					projector.unprojectVector( vector, camera );
 					const raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize());
-					const found = raycaster.intersectObjects(mesh);
-					mesh.material.color.set(0x535353);
-					
+					const found = raycaster.intersectObjects(scene.children, true);
+					if ( found.length > 0){
+						mesh.material.color.set(0x535353);
+					}
 				}, false);
 
 			}

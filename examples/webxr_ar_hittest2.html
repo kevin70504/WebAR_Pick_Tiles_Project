@@ -129,7 +129,7 @@
 				renderer.domElement.addEventListener('touchstart', function(e){
 
 					e.preventDefault();
-					clickMouse.x = (e.touches[0].pageX / window.innerWidth) * 2 - 1;
+					clickMouse.x = +(e.touches[0].pageX / window.innerWidth) * 2 +- 1;
         			clickMouse.y = -(e.touches[0].pageY / window.innerHeight) * 2 + 1;
 					var vector = new THREE.Vector3( clickMouse.x, clickMouse.y, 1 );
 					projector.unprojectVector( vector, camera );

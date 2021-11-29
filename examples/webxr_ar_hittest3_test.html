@@ -67,7 +67,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.xr.enabled = true;
-				container.appendChild( renderer.domElement );
+                document.body.appendChild(renderer.domElement)
+				//container.appendChild( renderer.domElement );
 
 				//
 
@@ -328,10 +329,6 @@
 				}, false);*/
 
 				//
-				//選擇模式
-				window.addEventListener("click",event =>{
-					
-				});
 	
 				//
 		}

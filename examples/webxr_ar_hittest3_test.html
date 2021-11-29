@@ -45,6 +45,7 @@
 			import * as THREE from '../build/three.module.js';
 			import { ARButton } from './jsm/webxr/ARButton.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+            import { DragControls } from './jsm/controls/DragControls.js';
 
 			let container;
 			let camera, scene, renderer;
@@ -159,20 +160,22 @@
 					console.log("An error happened");
 				});
 
-				tex_arr.push(texture,texture2,texture3,texture4);
 
 				//
 
 				const geometry = new THREE.CylinderGeometry( 0.1, 0.1, 0.2, 32 ).translate( 0, 0.1, 0 );
-				const planegeo = new THREE.PlaneBufferGeometry(0.5,0.5);
-				material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
+				const planegeo = new THREE.PlaneBufferGeometry(1,1);
+				material = new THREE.MeshBasicMaterial( { map:texture } );
 				mat_arr.push(material);
-				mesh = new THREE.Mesh( planegeo, mat_arr[0]);
+				mesh = new THREE.Mesh( planegeo,material);
 				mesh.userData.draggable = true;
     			mesh.userData.name = 'Tilies'+ mesh_index;
-				mesh.visible = false;
+                mesh.position.set(0,-1.6,-3);
+                mesh.rotation.x = -(Math.PI / 2);
 				mesh_arr.push(mesh);
 				scene.add( mesh_arr[0]);
+                console.log(mesh.position);
+                console.log(mesh.visible);
 
 
 				/*function onSelect() {
@@ -182,275 +185,14 @@
 						mesh.position.setFromMatrixPosition( reticle.matrix );
 						mesh.rotation.x = -(Math.PI / 2);
 						scene.add( mesh );
+                        console.log(mesh.position);
 					}
 				}*/
 
 				//
 
-				const matbtn01 = document.getElementById("1");
-				matbtn01.addEventListener("click",function(){
-					if(modeindex == 0){
-						mat_arr[mat_index].map = tex_arr[0];
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						mesh_arr[0].material.map = tex_arr[0];
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mesh_arr[0].needsUpdate = true;
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						mesh_arr[1].material.map = tex_arr[0];
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mesh_arr[1].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						mesh_arr[2].material.map = tex_arr[0];
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mesh_arr[2].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						mesh_arr[3].material.map = tex_arr[0];
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mesh_arr[3].needsUpdate = true;
-					}
-				});
-
-				const matbtn02 = document.getElementById("2");
-				matbtn02.addEventListener("click",function(){
-					if(modeindex == 0){
-						mat_arr[mat_index].map = tex_arr[1];
-						tex_arr[0].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						mesh_arr[0].material.map = tex_arr[1];
-						tex_arr[0].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						mesh_arr[0].needsUpdate = true;
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						mesh_arr[1].material.map = tex_arr[1];
-						tex_arr[0].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						mesh_arr[1].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						mesh_arr[2].material.map = tex_arr[1];
-						tex_arr[0].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						mesh_arr[2].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						mesh_arr[3].material.map = tex_arr[1];
-						tex_arr[0].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						mesh_arr[3].needsUpdate = true;
-					}
-
-				});
-
-				const matbtn03 = document.getElementById("3");
-				matbtn03.addEventListener("click",function(){
-					if(modeindex == 0){
-						mat_arr[mat_index].map =tex_arr[2];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[3].dispose();
-						tex_arr[2].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						mesh_arr[0].material.map = tex_arr[2];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[3].dispose();
-						tex_arr[2].needsUpdate = true;
-						mesh_arr[0].needsUpdate = true;
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						mesh_arr[1].material.map = tex_arr[2];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[3].dispose();
-						tex_arr[2].needsUpdate = true;
-						mesh_arr[1].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						mesh_arr[2].material.map = tex_arr[2];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[3].dispose();
-						tex_arr[2].needsUpdate = true;
-						mesh_arr[2].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						mesh_arr[3].material.map = tex_arr[2];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[3].dispose();
-						tex_arr[2].needsUpdate = true;
-						mesh_arr[3].needsUpdate = true;
-					}
-
-				});
-
-				const matbtn04 = document.getElementById("4");
-				matbtn04.addEventListener("click",function(){
-					if(modeindex == 0){
-						mat_arr[mat_index].map = tex_arr[3];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].needsUpdate = true;
-						mat_arr[mat_index].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						mesh_arr[0].material.map = tex_arr[3];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].needsUpdate = true;
-						mesh_arr[0].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						mesh_arr[1].material.map = tex_arr[3];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].needsUpdate = true;
-						mesh_arr[1].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						mesh_arr[2].material.map = tex_arr[3];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].needsUpdate = true;
-						mesh_arr[2].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						mesh_arr[3].material.map = tex_arr[3];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].needsUpdate = true;
-						mesh_arr[3].needsUpdate = true;
-					}
-				});
-
+                const controls = new DragControls(mesh_arr[0], camera, renderer.domElement)
 				//
-				const setbtn = document.getElementById("place-button");
-				setbtn.addEventListener("click",function(){
-					if ( reticle.visible && index == 0 && modeindex == 0) {
-						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
-						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
-						mesh_arr[mesh_index].visible = true;
-
-					}
-					else if(reticle.visible && index == 1 && modeindex == 0){
-						const Material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
-						mat_arr.push(Material);
-						const Mesh = new THREE.Mesh( planegeo, mat_arr[mat_index] );
-						mesh_arr.push(Mesh);
-						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
-						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
-						mesh_arr[mesh_index].visible = true;
-						mesh_arr[mesh_index].userData.draggable = true;
-    					mesh_arr[mesh_index].userData.name = 'Tilies'+ mesh_index;
-						scene.add( mesh_arr[mesh_index] );
-						index = 0;
-					}
-				})
-
-				const combtn = document.getElementById("complete-button")
-				combtn.addEventListener("click",function(){
-					if(index == 0 ){
-						index++;
-						mat_index++;
-						mesh_index++;
-					}
-				});
-
-				//
-				const mode01btn = document.getElementById("mode01-button")
-				mode01btn.addEventListener("click",function(){
-					const click_text = document.getElementById("text");
-					const btn_left = document.getElementById("left");
-					if(modeindex == 0 ){
-						modeindex++;
-						reticle.visible = false;
-						click_text.style.display = "block";
-						btn_left.style.display = "block";
-					}
-					else{
-						modeindex = 0;
-						reticle.visible = true;
-						click_text.style.display = "none";
-						btn_left.style.display = "none";
-						for (let i = 0; i < mesh_arr.length; i++) {
-							mesh_arr[i].material.color.set(0xffffff);               
-						}
-					}
-				});
-				const btn_left = document.getElementById("left");
-					btn_left.addEventListener("click",function(){
-					if(mode01_index == 0 && modeindex==1){
-						mode01_index++;
-						target = mesh_arr[0];
-						target.material.color.set(0x535353);
-					}
-					else if(mode01_index == 1 && modeindex==1){
-						mode01_index++;
-						target = mesh_arr[1];
-						target.material.color.set(0x535353);
-					}
-					else if(mode01_index == 2 && modeindex==1){
-						mode01_index = 0;
-						target = mesh_arr[2];
-						target.material.color.set(0x535353);
-					}
-					if(target != mesh_arr[0]){
-						mesh_arr[0].material.color.set(0xffffff);    
-					}
-					if(target != mesh_arr[1]){
-						mesh_arr[1].material.color.set(0xffffff);    
-					}
-					if(target != mesh_arr[2]){
-						mesh_arr[2].material.color.set(0xffffff);    
-					}   
-				});
 
 				//
 
@@ -468,6 +210,7 @@
 
 				//
 
+                //
 				//window.addEventListener( 'resize', onWindowResize );
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -728,6 +471,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+                render();
 
 			}
 

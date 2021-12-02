@@ -530,22 +530,6 @@
 
 					}
 
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name &&reticle.visible == false){
-						e.preventDefault();
-					
-						if(!touchDown){
-							return;
-						}
-
-						deltaX = e.touches[0].pageX - touchX;
-						deltaY = e.touches[0].pageY - touchY;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
-
-						Mode01_scaleObject(0);
-
-					}
-
 				}, false);
 
 				//

@@ -163,3 +163,12 @@ body {
       height: 35px;
       display: none;
   }
+
+  #P{
+    position: absolute;
+    top: 100px;
+    left: calc(45%);
+    width: 140px;
+    color: black;
+    background-color: white;
+}

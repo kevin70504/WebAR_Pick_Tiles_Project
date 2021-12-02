@@ -44,7 +44,6 @@
 
 			import * as THREE from '../build/three.module.js';
 			import { ARButton } from './jsm/webxr/ARButton.js';
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			let container;
 			let camera, scene, renderer;
@@ -484,29 +483,21 @@
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name &&reticle.visible == false){
+					else if(modeindex == 1 &&reticle.visible == false){ //選擇模式
 						e.preventDefault();
 						touchDown=true;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name &&reticle.visible == false){
-						e.preventDefault();
-						touchDown=true;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name &&reticle.visible == false){
-						e.preventDefault();
-						touchDown=true;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name &&reticle.visible == false){
-						e.preventDefault();
-						touchDown=true;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
+						clickMouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+						clickMouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+
+						raycaster.setFromCamera(clickMouse,camera);
+						const found = raycaster.intersectObjects(scene.children);
+						if(found.length > 0 && found[0].object.userData.draggable){
+						draggable = found[0].object;
+						getp.textContent = "找到" + draggable.userData.name;
+						scene.remove(draggable);
+						draggable.geometry.dispose();
+						draggable.material.dispose();
+						}   
 					}
 				}, false);
 
@@ -521,19 +512,6 @@
 						e.preventDefault();
 						touchDown = false;
 					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name && reticle.visible == false){
-						e.preventDefault();
-						touchDown = false;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name && reticle.visible == false){
-						e.preventDefault();
-						touchDown = false;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name && reticle.visible == false){
-						e.preventDefault();
-						touchDown = false;
-					}
-
 
 				}, false);
 
@@ -570,53 +548,6 @@
 
 					}
 
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name &&reticle.visible == false){
-						e.preventDefault();
-					
-						if(!touchDown){
-							return;
-						}
-
-						deltaX = e.touches[0].pageX - touchX;
-						deltaY = e.touches[0].pageY - touchY;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
-
-						Mode01_scaleObject(1);
-
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name &&reticle.visible == false){
-						e.preventDefault();
-					
-						if(!touchDown){
-							return;
-						}
-
-						deltaX = e.touches[0].pageX - touchX;
-						deltaY = e.touches[0].pageY - touchY;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
-
-						Mode01_scaleObject(2);
-
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name &&reticle.visible == false){
-						e.preventDefault();
-					
-						if(!touchDown){
-							return;
-						}
-
-						deltaX = e.touches[0].pageX - touchX;
-						deltaY = e.touches[0].pageY - touchY;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
-
-						Mode01_scaleObject(3);
-
-					}
 				}, false);
 
 				//

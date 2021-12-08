@@ -10,17 +10,16 @@
 
 		<div id="content">
 		
-			<!--div id="mySidenav" class="sidenav">
+			<div id="mySidenav" class="sidenav">
 				<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 				<a class="ar-texture" id="1" href="#">item01</a>
 				<a class="ar-texture" id="2" href="#">item02</a>
 				<a class="ar-texture" id="3" href="#">item03</a>
 				<a class="ar-texture" id="4" href="#">item04</a>
-			</div-->
+			</div>
 			<div id="container" style="position: fixed;"></div>
-			<p id="P">123154634</p>
 	
-		<!--span style="font-size:30px;cursor:pointer;position: absolute;" onclick="openNav()">&#9776; open</span-->
+		<span style="font-size:30px;cursor:pointer;position: absolute;" onclick="openNav()">&#9776; open</span>
 		
 		<button type="button" id="place-button">PLACE</button>
 		<button type="button" id="complete-button">Complete</button>
@@ -31,7 +30,7 @@
 		</div>
 
 
-		<!--script>
+		<script>
 		  function openNav() {
 			document.getElementById("mySidenav").style.width = "250px";
 		  }
@@ -40,11 +39,12 @@
 			document.getElementById("mySidenav").style.width = "0";
 		  }
 
-		</script-->
+		</script>
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 			import { ARButton } from './jsm/webxr/ARButton.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			let container;
 			let camera, scene, renderer;
@@ -127,7 +127,7 @@
 				});
 
 				texture2 = textureloader.load(
-				"textures/tiles/large_floor_tiles_02_diff_1k.jpg",
+				"textures/tiles/Tiles01.jpeg",
 				function(texture2){
 					texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
 					texture2.offset.set(0,0);
@@ -138,7 +138,7 @@
 				});
 
 				texture3 = textureloader.load(
-				"textures/tiles/marble_01_diff_1k.jpg",
+				"textures/tiles/Tiles03.jpeg",
 				function(texture3){
 					texture3.wrapS = texture3.wrapT = THREE.RepeatWrapping;
 					texture3.offset.set(0,0);
@@ -149,7 +149,7 @@
 				});
 
 				texture4 = textureloader.load(
-				"textures/tiles/tiled_floor_001_diffuse_1k.jpg",
+				"textures/tiles/Tiles04.jpeg",
 				function(texture4){
 					texture4.wrapS = texture4.wrapT = THREE.RepeatWrapping;
 					texture4.offset.set(0,0);
@@ -187,7 +187,6 @@
 
 				//
 
-				/*
 				const matbtn01 = document.getElementById("1");
 				matbtn01.addEventListener("click",function(){
 					if(modeindex == 0){
@@ -370,8 +369,6 @@
 						mesh_arr[3].needsUpdate = true;
 					}
 				});
-				
-				*/
 
 				//
 				const setbtn = document.getElementById("place-button");
@@ -487,21 +484,29 @@
 						touchX = e.touches[0].pageX;
 						touchY = e.touches[0].pageY;
 					}
-					//選擇模式
-					else if(modeindex == 1 &&reticle.visible == false){ 
+					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name &&reticle.visible == false){
 						e.preventDefault();
 						touchDown=true;
-						clickMouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
-						clickMouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
-						
-						raycaster.setFromCamera(clickMouse,camera);
-						const found = raycaster.intersectObjects(scene.children);
-						if(found.length > 0 && found[0].object.userData.draggable){
-						draggable = found[0].object;
-						draggable.material.set(0x535353);
-						}
-						const getp = document.querySelector("P");
-						getp.textContent = "找到" + draggable.userData.name;   
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name &&reticle.visible == false){
+						e.preventDefault();
+						touchDown=true;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name &&reticle.visible == false){
+						e.preventDefault();
+						touchDown=true;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name &&reticle.visible == false){
+						e.preventDefault();
+						touchDown=true;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
 					}
 				}, false);
 
@@ -516,6 +521,19 @@
 						e.preventDefault();
 						touchDown = false;
 					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name && reticle.visible == false){
+						e.preventDefault();
+						touchDown = false;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name && reticle.visible == false){
+						e.preventDefault();
+						touchDown = false;
+					}
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name && reticle.visible == false){
+						e.preventDefault();
+						touchDown = false;
+					}
+
 
 				}, false);
 
@@ -536,6 +554,69 @@
 
 					}
 
+					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name &&reticle.visible == false){
+						e.preventDefault();
+					
+						if(!touchDown){
+							return;
+						}
+
+						deltaX = e.touches[0].pageX - touchX;
+						deltaY = e.touches[0].pageY - touchY;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+
+						Mode01_scaleObject(0);
+
+					}
+
+					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name &&reticle.visible == false){
+						e.preventDefault();
+					
+						if(!touchDown){
+							return;
+						}
+
+						deltaX = e.touches[0].pageX - touchX;
+						deltaY = e.touches[0].pageY - touchY;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+
+						Mode01_scaleObject(1);
+
+					}
+
+					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name &&reticle.visible == false){
+						e.preventDefault();
+					
+						if(!touchDown){
+							return;
+						}
+
+						deltaX = e.touches[0].pageX - touchX;
+						deltaY = e.touches[0].pageY - touchY;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+
+						Mode01_scaleObject(2);
+
+					}
+
+					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name &&reticle.visible == false){
+						e.preventDefault();
+					
+						if(!touchDown){
+							return;
+						}
+
+						deltaX = e.touches[0].pageX - touchX;
+						deltaY = e.touches[0].pageY - touchY;
+						touchX = e.touches[0].pageX;
+						touchY = e.touches[0].pageY;
+
+						Mode01_scaleObject(3);
+
+					}
 				}, false);
 
 				//
@@ -557,7 +638,7 @@
 				mesh.rotation.y += deltaX / 100;
 			}
 		}
-		
+
 		function scaleObject(){
 			if(mesh_arr[mesh_index] && reticle.visible){
 				mesh_arr[mesh_index].scale.x += deltaX / 100;

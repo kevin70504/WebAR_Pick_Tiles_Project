@@ -10,28 +10,32 @@
 
 		<div id="content">
 		
-			<!--div id="mySidenav" class="sidenav">
+			<div id="mySidenav" class="sidenav">
 				<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 				<a class="ar-texture" id="1" href="#">item01</a>
 				<a class="ar-texture" id="2" href="#">item02</a>
 				<a class="ar-texture" id="3" href="#">item03</a>
 				<a class="ar-texture" id="4" href="#">item04</a>
-			</div-->
+			</div>
 			<div id="container" style="position: fixed;"></div>
-			<p id="P">123154634</p>
+			<p id="P">請等待圓環讀取</p>
 	
-		<!--span style="font-size:30px;cursor:pointer;position: absolute;" onclick="openNav()">&#9776; open</span-->
+		<span style="font-size:30px;cursor:pointer;position: absolute;" onclick="openNav()">&#9776; open</span>
 		
 		<button type="button" id="place-button">PLACE</button>
 		<button type="button" id="complete-button">Complete</button>
 		<button type="button" id="mode01-button">Select Mode</button>
-		<button type="button" id="left">Change</button>
+		<button type="button" id="delete">Delete</button>
+		<button type="button" id="zoom_on"> Zoom on </button>
+		<button type="button" id="zoom_down"> Zoom Down </button>
+		<button type="button" id="drog">Drog</button>
+		<button type="button" id="measured">Measured</button>
 		<div id="text">Click Mode Open</div>
 
 		</div>
 
 
-		<!--script>
+		<script>
 		  function openNav() {
 			document.getElementById("mySidenav").style.width = "250px";
 		  }
@@ -40,33 +44,47 @@
 			document.getElementById("mySidenav").style.width = "0";
 		  }
 
-		</script-->
+		</script>
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 			import { ARButton } from './jsm/webxr/ARButton.js';
+			import { DragControls } from "./jsm/controls/DragControls.js"
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import { FontLoader} from './jsm/loaders/FontLoader.js';
 
 			let container;
 			let camera, scene, renderer;
 			let controller;
 
-			let reticle;
+			let reticle,reticle_target;
 
 			let hitTestSource = null;
 			let hitTestSourceRequested = false;
 
-			let mesh;
-			let mesh_arr = [];
+			let mesh,material;
 			let mesh_index = 0;
 			let texture,texture2,texture3,texture4;
-			let tex_arr = [];
-			let material;
-			let mat_arr = [];
+			let mesh_arr = [],tex_arr = [],mat_arr = [];
 			let mat_index = 0;
 			let index = 0;
 			let modeindex = 0;
 			let target_index = 0;
 			let mode01_index = 0 ;
+			let mode02_index = 0 ;
+			let start_index = 0;
+			let worldposition = new THREE.Vector3();
+
+			let workingVec3 = new THREE.Vector3();
+			let textmesh;
+			let measurements=[];
+			let currentLine;
+			let line_arr = [];
+            let line_inedx = 0;
+            let text_arr = [];
+            let text_index = 0;
+			
+			let touchDown, touchX, touchY, deltaX, deltaY, found, dControl,posY;
 
 			let raycaster = new THREE.Raycaster();
 			let clickMouse = new THREE.Vector2();
@@ -116,7 +134,7 @@
 
 				const textureloader = new THREE.TextureLoader();
 				texture = textureloader.load(
-				"textures/tiles/floor_tiles_06_diff_1k.jpg",
+				"https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles01.jpeg?v=1638944482701",
 				function(texture){
 					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 					texture.offset.set(0,0);
@@ -127,7 +145,7 @@
 				});
 
 				texture2 = textureloader.load(
-				"textures/tiles/large_floor_tiles_02_diff_1k.jpg",
+				"https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles02.jpeg?v=1638944483969",
 				function(texture2){
 					texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
 					texture2.offset.set(0,0);
@@ -138,7 +156,7 @@
 				});
 
 				texture3 = textureloader.load(
-				"textures/tiles/marble_01_diff_1k.jpg",
+				"https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles03.jpeg?v=1638944486359",
 				function(texture3){
 					texture3.wrapS = texture3.wrapT = THREE.RepeatWrapping;
 					texture3.offset.set(0,0);
@@ -149,7 +167,7 @@
 				});
 
 				texture4 = textureloader.load(
-				"textures/tiles/tiled_floor_001_diffuse_1k.jpg",
+				"https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles04.jpeg?v=1638944489229",
 				function(texture4){
 					texture4.wrapS = texture4.wrapT = THREE.RepeatWrapping;
 					texture4.offset.set(0,0);
@@ -165,15 +183,21 @@
 
 				const geometry = new THREE.CylinderGeometry( 0.1, 0.1, 0.2, 32 ).translate( 0, 0.1, 0 );
 				const planegeo = new THREE.PlaneBufferGeometry(0.5,0.5);
-				material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
+				material = new THREE.MeshBasicMaterial( { side: THREE.DoubleSide , map:tex_arr[0] } );
 				mat_arr.push(material);
 				mesh = new THREE.Mesh( planegeo, mat_arr[0]);
-				mesh.userData.draggable = true;
-    			mesh.userData.name = 'Tilies'+ mesh_index;
-				mesh.visible = false;
-				mesh_arr.push(mesh);
-				scene.add( mesh_arr[0]);
-
+        
+				mesh.position.set(0, -0.8, -3);
+				mesh.rotation.x = -(Math.PI / 2);
+				
+					mesh.userData.draggable = true;
+					mesh.userData.name = 'Tilies'+ mesh_index;
+					mesh.visible = false;
+					mesh_arr.push(mesh);
+					scene.add( mesh_arr[0]);
+				
+				dControl = new DragControls([mesh],camera,renderer.domElement);
+        
 
 				/*function onSelect() {
 
@@ -187,7 +211,6 @@
 
 				//
 
-				/*
 				const matbtn01 = document.getElementById("1");
 				matbtn01.addEventListener("click",function(){
 					if(modeindex == 0){
@@ -199,38 +222,13 @@
 						mat_arr[mat_index].needsUpdate = true;
 					}
 
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						mesh_arr[0].material.map = tex_arr[0];
+					else if(modeindex == 1 && draggable.userData.draggable){
+						draggable.material.map = tex_arr[0];
 						tex_arr[1].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
 						tex_arr[0].needsUpdate = true;
-						mesh_arr[0].needsUpdate = true;
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						mesh_arr[1].material.map = tex_arr[0];
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mesh_arr[1].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						mesh_arr[2].material.map = tex_arr[0];
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mesh_arr[2].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						mesh_arr[3].material.map = tex_arr[0];
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[0].needsUpdate = true;
-						mesh_arr[3].needsUpdate = true;
+						draggable.material.needsUpdate = true;
 					}
 				});
 
@@ -245,40 +243,14 @@
 						mat_arr[mat_index].needsUpdate = true;
 					}
 
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						mesh_arr[0].material.map = tex_arr[1];
+					else if(modeindex == 1 && draggable.userData.draggable){
+						draggable.material.map = tex_arr[1];
 						tex_arr[0].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].dispose();
 						tex_arr[1].needsUpdate = true;
-						mesh_arr[0].needsUpdate = true;
+						draggable.material.needsUpdate = true;
 					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						mesh_arr[1].material.map = tex_arr[1];
-						tex_arr[0].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						mesh_arr[1].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						mesh_arr[2].material.map = tex_arr[1];
-						tex_arr[0].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						mesh_arr[2].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						mesh_arr[3].material.map = tex_arr[1];
-						tex_arr[0].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].dispose();
-						tex_arr[1].needsUpdate = true;
-						mesh_arr[3].needsUpdate = true;
-					}
-
 				});
 
 				const matbtn03 = document.getElementById("3");
@@ -291,40 +263,14 @@
 						tex_arr[2].needsUpdate = true;
 						mat_arr[mat_index].needsUpdate = true;
 					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						mesh_arr[0].material.map = tex_arr[2];
+					else if(modeindex == 1 && draggable.userData.draggable){
+						draggable.material.map = tex_arr[2];
 						tex_arr[0].dispose();
 						tex_arr[1].dispose();
 						tex_arr[3].dispose();
 						tex_arr[2].needsUpdate = true;
-						mesh_arr[0].needsUpdate = true;
+						draggable.material.needsUpdate = true;
 					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						mesh_arr[1].material.map = tex_arr[2];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[3].dispose();
-						tex_arr[2].needsUpdate = true;
-						mesh_arr[1].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						mesh_arr[2].material.map = tex_arr[2];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[3].dispose();
-						tex_arr[2].needsUpdate = true;
-						mesh_arr[2].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						mesh_arr[3].material.map = tex_arr[2];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[3].dispose();
-						tex_arr[2].needsUpdate = true;
-						mesh_arr[3].needsUpdate = true;
-					}
-
 				});
 
 				const matbtn04 = document.getElementById("4");
@@ -337,57 +283,36 @@
 						tex_arr[3].needsUpdate = true;
 						mat_arr[mat_index].needsUpdate = true;
 					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name){
-						mesh_arr[0].material.map = tex_arr[3];
+					else if(modeindex == 1 && draggable.userData.draggable){
+						draggable.material.map = tex_arr[3];
 						tex_arr[0].dispose();
 						tex_arr[1].dispose();
 						tex_arr[2].dispose();
 						tex_arr[3].needsUpdate = true;
-						mesh_arr[0].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[1].userData.name){
-						mesh_arr[1].material.map = tex_arr[3];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].needsUpdate = true;
-						mesh_arr[1].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[2].userData.name){
-						mesh_arr[2].material.map = tex_arr[3];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].needsUpdate = true;
-						mesh_arr[2].needsUpdate = true;
-					}
-					else if(modeindex == 1 && target.userData.name == mesh_arr[3].userData.name){
-						mesh_arr[3].material.map = tex_arr[3];
-						tex_arr[0].dispose();
-						tex_arr[1].dispose();
-						tex_arr[2].dispose();
-						tex_arr[3].needsUpdate = true;
-						mesh_arr[3].needsUpdate = true;
+						draggable.material.needsUpdate = true;
 					}
 				});
-				
-				*/
 
 				//
 				const setbtn = document.getElementById("place-button");
 				setbtn.addEventListener("click",function(){
-					if ( reticle.visible && index == 0 && modeindex == 0) {
-						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
-						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
-						mesh_arr[mesh_index].visible = true;
+					if ( reticle.visible && index == 0 && modeindex == 0 && mode02_index == 0) {
+					reticle_target.getWorldPosition(worldposition);
+					//mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
+					mesh_arr[mesh_index].position.set( worldposition.x, posY, worldposition.z);
+					mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
+					mesh_arr[mesh_index].visible = true;
 
 					}
-					else if(reticle.visible && index == 1 && modeindex == 0){
+					else if(reticle.visible && index == 1 && modeindex == 0 && mode02_index == 0){
+           				reticle_target.getWorldPosition(worldposition);
 						const Material = new THREE.MeshBasicMaterial( { map:tex_arr[0] } );
+           				Material.side = THREE.DoubleSide;
 						mat_arr.push(Material);
 						const Mesh = new THREE.Mesh( planegeo, mat_arr[mat_index] );
 						mesh_arr.push(Mesh);
-						mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
+						//mesh_arr[mesh_index].position.setFromMatrixPosition( reticle.matrix );
+            			mesh_arr[mesh_index].position.set( worldposition.x, posY, worldposition.z);
 						mesh_arr[mesh_index].rotation.x = -(Math.PI / 2);
 						mesh_arr[mesh_index].visible = true;
 						mesh_arr[mesh_index].userData.draggable = true;
@@ -395,7 +320,66 @@
 						scene.add( mesh_arr[mesh_index] );
 						index = 0;
 					}
-				})
+					else if(reticle_target.visible){
+						reticle_target.getWorldPosition(worldposition);
+						start_index++;
+						posY = worldposition.y;
+						document.getElementById("complete-button").style.display = "block";
+						document.getElementById("zoom_on").style.display = "block";
+						document.getElementById("zoom_down").style.display = "block";  
+					}
+					else if( reticle.visible && modeindex == 0 && mode02_index == 1){
+						const pt = new THREE.Vector3();
+						pt.setFromMatrixPosition(reticle.matrix);
+						measurements.push(pt);
+						if (measurements.length == 2) {
+							const distance = Math.round(getDistance(measurements) * 100);
+							
+							const getp = document.querySelector("p");
+							workingVec3 =  getCenterPoint(measurements);
+							const fontloader = new FontLoader();
+							fontloader.load( './fonts/helvetiker_regular.typeface.json', function ( font ) {
+							const color = 0x006699;
+							const matDark = new THREE.LineBasicMaterial( {
+								color: color,
+								side: THREE.DoubleSide
+							} );
+							const matLite = new THREE.MeshBasicMaterial( {
+								color: color,
+								transparent: true,
+								opacity: 0.4,
+								side: THREE.DoubleSide
+							} );
+							const message3 = distance + "cm";
+							//const message2 = "This use "+ message +" tiles";
+							const shapes = font.generateShapes( message3, 0.05 );
+
+							const geometry = new THREE.ShapeGeometry( shapes );
+							geometry.computeBoundingBox();
+							const xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+							geometry.translate( xMid, 0, 0 );
+							// make shape ( N.B. edge view not visible )
+							textmesh = new THREE.Mesh( geometry, matLite );
+							//textmesh.position.set(workingVec3.x,workingVec3.y,workingVec3.z);
+							textmesh.position.setFromMatrixPosition( workingVec3.matrix );
+                            text_arr.push(textmesh);
+                            scene.add(text_arr[text_index]);
+                            //scene.add(textmesh);
+                            text_index++;
+							} );
+
+							measurements = [];
+                        	currentLine = null;
+						}
+						else{
+							currentLine = initLine(measurements[0]);
+							line_arr.push(currentLine);
+							scene.add(currentLine);
+							scene.add(line_arr[line_inedx]);
+							line_inedx ++;
+							}
+					}
+			})
 
 				const combtn = document.getElementById("complete-button")
 				combtn.addEventListener("click",function(){
@@ -410,62 +394,287 @@
 				const mode01btn = document.getElementById("mode01-button")
 				mode01btn.addEventListener("click",function(){
 					const click_text = document.getElementById("text");
-					const btn_left = document.getElementById("left");
+					const btn_delete = document.getElementById("delete");
+					const btn_zoomon = document.getElementById("zoom_on");
+					const btn_zoomdown = document.getElementById("zoom_down");
+					const btn_drog = document.getElementById("drog");
+          
 					if(modeindex == 0 ){
 						modeindex++;
 						reticle.visible = false;
 						click_text.style.display = "block";
-						btn_left.style.display = "block";
+						btn_delete.style.display = "block";
+						btn_zoomon.style.display = "block";
+						btn_zoomdown.style.display = "block";
+						btn_drog.style.display = "block";
 					}
 					else{
 						modeindex = 0;
 						reticle.visible = true;
 						click_text.style.display = "none";
-						btn_left.style.display = "none";
+						btn_delete.style.display = "none";
+						btn_zoomon.style.display = "none";
+						btn_zoomdown.style.display = "none";
+						btn_drog.style.display = "none";
 						for (let i = 0; i < mesh_arr.length; i++) {
 							mesh_arr[i].material.color.set(0xffffff);               
 						}
 					}
 				});
-				const btn_left = document.getElementById("left");
-					btn_left.addEventListener("click",function(){
-					if(mode01_index == 0 && modeindex==1){
-						mode01_index++;
-						target = mesh_arr[0];
-						target.material.color.set(0x535353);
+        
+        //
+				const btn_delete = document.getElementById("delete");
+				btn_delete.addEventListener("click",function(){
+				scene.remove(draggable);
+				});
+				
+        //
+				const btn_drog = document.getElementById("drog");
+				btn_drog.addEventListener("click",function(){
+				
+				if(modeindex == 1){
+					modeindex++;
+					console.log(modeindex);
+				}
+				else if(modeindex == 2){
+					modeindex = 1;
+					console.log(modeindex);
+				}
+				});
+				//
+        
+				const btn_zoomOn = document.querySelector("#zoom_on");
+				const btn_zoomDown = document.querySelector("#zoom_down");
+				btn_zoomOn.addEventListener("click",function(){
+          
+          
+				if ( reticle.visible == true && modeindex == 0) {
+					mesh_arr[mesh_index].scale.x += 0.5;
+					mesh_arr[mesh_index].scale.y += 0.5;
+					mesh_arr[mesh_index].scale.z += 0.5;
+
+					if(mesh_arr[mesh_index].scale.x == 0.1){
+						mesh_arr[mesh_index].scale.x = 0.1;
+						mesh_arr[mesh_index].scale.y = 0.1;
+						mesh_arr[mesh_index].scale.z = 0.1;
+						}
+
+					if(mesh_arr[mesh_index].material.map.repeat.x == 0.1){
+						mesh_arr[mesh_index].material.map.repeat.x = 0.1;
+						mesh_arr[mesh_index].material.map.repeat.y = 0.1;
+						mesh_arr[mesh_index].material.map.repeat.z = 0.1;
 					}
-					else if(mode01_index == 1 && modeindex==1){
-						mode01_index++;
-						target = mesh_arr[1];
-						target.material.color.set(0x535353);
+					if(mesh_arr[mesh_index].material.map == tex_arr[0]){
+
+						mesh_arr[mesh_index].material.map.repeat.x += 0.5;
+						mesh_arr[mesh_index].material.map.repeat.y += 0.5;
+						mesh_arr[mesh_index].material.needsUpdate = true;
 					}
-					else if(mode01_index == 2 && modeindex==1){
-						mode01_index = 0;
-						target = mesh_arr[2];
-						target.material.color.set(0x535353);
+					else if((mesh_arr[mesh_index].map == tex_arr[1])){
+
+						mesh_arr[mesh_index].material.map.repeat.x += 0.5;
+						mesh_arr[mesh_index].material.map.repeat.y += 0.5;
+						mesh_arr[mesh_index].material.needsUpdate = true;
 					}
-					if(target != mesh_arr[0]){
-						mesh_arr[0].material.color.set(0xffffff);    
+					else if((mat_arr[a].map == tex_arr[2])){
+
+						mesh_arr[mesh_index].material.map.repeat.x += 0.5;
+						mesh_arr[mesh_index].material.map.repeat.y += 0.5;
+						mesh_arr[mesh_index].material.needsUpdate = true;
 					}
-					if(target != mesh_arr[1]){
-						mesh_arr[1].material.color.set(0xffffff);    
+					else{
+						mesh_arr[mesh_index].material.map.repeat.x += 0.5;
+						mesh_arr[mesh_index].material.map.repeat.y += 0.5;
+						mesh_arr[mesh_index].material.needsUpdate = true;
+					}              
+				}
+				else if(reticle.visible == false && modeindex == 1){
+						draggable.scale.x += 0.5;
+						draggable.scale.y += 0.5;
+						draggable.scale.z += 0.5;
+
+						if(draggable.scale.x == 0.1){
+							draggable.scale.x = 0.1;
+							draggable.scale.y = 0.1;
+							draggable.scale.z = 0.1;
+						}
+
+						if(draggable.material.map.repeat.x == 0.1){
+							draggable.material.map.repeat.x = 0.1;
+							draggable.material.map.repeat.y = 0.1;
+							draggable.material.map.repeat.z = 0.1;
+						}
+						if(draggable.material.map == tex_arr[0]){
+						draggable.material.map.repeat.x += 0.5;
+						draggable.material.map.repeat.y += 0.5;
+						draggable.material.needsUpdate = true;
+						}
+						else if((draggable.map == tex_arr[1])){
+						draggable.material.map.repeat.x += 0.5;
+						draggable.material.map.repeat.y += 0.5;
+						draggable.material.needsUpdate = true;
+						}
+						else if((mat_arr[a].map == tex_arr[2])){
+						draggable.material.map.repeat.x += 0.5;
+						draggable.material.map.repeat.y += 0.5;
+						draggable.material.needsUpdate = true;
+						}
+						else{
+						draggable.material.map.repeat.x += 0.5;
+						draggable.material.map.repeat.y += 0.5;
+						draggable.material.needsUpdate = true;
+						}
 					}
-					if(target != mesh_arr[2]){
-						mesh_arr[2].material.color.set(0xffffff);    
-					}   
+
+			});
+        
+       		btn_zoomDown.addEventListener("click",function(){
+         
+            if ( reticle.visible == true && modeindex == 0) {
+                  mesh_arr[mesh_index].scale.x -= 0.5;
+                  mesh_arr[mesh_index].scale.y -= 0.5;
+                  mesh_arr[mesh_index].scale.z -= 0.5;
+
+                  if(mesh_arr[mesh_index].scale.x <= 0){
+                      mesh_arr[mesh_index].scale.x = 0.1;
+                      mesh_arr[mesh_index].scale.y = 0.1;
+                      mesh_arr[mesh_index].scale.z = 0.1;
+                    }
+
+                  if(mesh_arr[mesh_index].material.map.repeat.x <= 0){
+                    mesh_arr[mesh_index].material.map.repeat.x = 0.1;
+                    mesh_arr[mesh_index].material.map.repeat.y = 0.1;
+                    mesh_arr[mesh_index].material.map.repeat.z = 0.1;
+                  }
+                  if(mesh_arr[mesh_index].material.map == tex_arr[0]){
+
+                    mesh_arr[mesh_index].material.map.repeat.x -= 0.5;
+                    mesh_arr[mesh_index].material.map.repeat.y -= 0.5;
+                    mesh_arr[mesh_index].material.needsUpdate = true;
+                  }
+                  else if((mesh_arr[mesh_index].map == tex_arr[1])){
+
+                    mesh_arr[mesh_index].material.map.repeat.x -= 0.5;
+                    mesh_arr[mesh_index].material.map.repeat.y -= 0.5;
+                    mesh_arr[mesh_index].material.needsUpdate = true;
+                  }
+                  else if((mat_arr[a].map == tex_arr[2])){
+
+                    mesh_arr[mesh_index].material.map.repeat.x -= 0.5;
+                    mesh_arr[mesh_index].material.map.repeat.y -= 0.5;
+                    mesh_arr[mesh_index].material.needsUpdate = true;
+                  }
+                  else{
+                    mesh_arr[mesh_index].material.map.repeat.x -= 0.5;
+                    mesh_arr[mesh_index].material.map.repeat.y -= 0.5;
+                    mesh_arr[mesh_index].material.needsUpdate = true;
+                  }
+              }
+			else if(reticle.visible == false && modeindex == 1){
+                  draggable.scale.x -= 0.5;
+                  draggable.scale.y -= 0.5;
+                  draggable.scale.z -= 0.5;
+
+                  if(draggable.scale.x <= 0){
+                      draggable.scale.x = 0.1;
+                      draggable.scale.y = 0.1;
+                      draggable.scale.z = 0.1;
+                    }
+
+                  if(draggable.material.map.repeat.x <= 0){
+                      draggable.material.map.repeat.x = 0.1;
+                      draggable.material.map.repeat.y = 0.1;
+                      draggable.material.map.repeat.z = 0.1;
+                  }
+                  if(draggable.material.map == tex_arr[0]){
+                    draggable.material.map.repeat.x -= 0.5;
+                    draggable.material.map.repeat.y -= 0.5;
+                    draggable.material.needsUpdate = true;
+                  }
+                  else if((draggable.map == tex_arr[1])){
+                    draggable.material.map.repeat.x -= 0.5;
+                    draggable.material.map.repeat.y -= 0.5;
+                    draggable.material.needsUpdate = true;
+                  }
+                  else if((mat_arr[a].map == tex_arr[2])){
+                    draggable.material.map.repeat.x -= 0.5;
+                    draggable.material.map.repeat.y -= 0.5;
+                    draggable.material.needsUpdate = true;
+                  }
+                  else{
+                    draggable.material.map.repeat.x -= 0.5;
+                    draggable.material.map.repeat.y -= 0.5;
+                    draggable.material.needsUpdate = true;
+                  }
+              }
+            
+        });
+				//
+				const btn_meas = document.querySelector("#measured");
+				btn_meas.addEventListener("click",function(){
+					const click_text = document.getElementById("text");
+					const btn_place = document.getElementById("place-button");
+					const btn_complete = document.getElementById("complete-button");
+					const btn_zoomon = document.getElementById("zoom_on");
+					const btn_zoomdown = document.getElementById("zoom_down");
+
+					if(mode02_index == 0){
+						mode02_index++;
+						btn_place.style.display = "block";
+						btn_complete.style.display = "none";
+						btn_zoomon.style.display = "none";
+						btn_zoomdown.style.display = "none";
+						click_text.style.display = "block"  
+						click_text.textContent = "Measured Mode Open";
+						click_text.style.width = "200px";
+						click_text.style.left= "calc(42%)";
+					}
+					else{
+						for (let index = 0; index < text_arr.length; index++) {
+							scene.remove(text_arr[index]);
+						}
+						for (let index = 0; index < line_arr.length; index++) {
+							scene.remove(line_arr[index]);
+						}
+						mode02_index = 0;
+						text_inedx = 0;
+                    	line_inedx = 0;
+						btn_complete.style.display = "block";
+						btn_zoomon.style.display = "block";
+						btn_zoomdown.style.display = "block";
+						click_text.style.display = "none";
+						click_text.style.width = "140px";
+						click_text.textContent = "Click Mode Open";
+						click_text.style.left= "calc(45%)"; 
+					}	
 				});
 
+
 				//
+      
 
 				/*controller = renderer.xr.getController( 0 );
 				controller.addEventListener( 'select', onSelect );
 				scene.add( controller );*/
-
-				reticle = new THREE.Mesh(
-					new THREE.RingGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
+        
+        		let ring = new THREE.RingBufferGeometry(0.045, 0.05, 32).rotateX(- Math.PI / 2);
+				let dot = new THREE.CircleBufferGeometry(0.005, 32).rotateX(- Math.PI / 2);
+        		let plane_geo = new THREE.PlaneBufferGeometry(0.06,0.01);
+        
+        		reticle_target = new THREE.Mesh(
+					plane_geo.rotateX( - Math.PI / 2 ),
 					new THREE.MeshBasicMaterial()
 				);
-				reticle.matrixAutoUpdate = false;
+        
+				reticle_target.matrixAutoUpdate = false;
+				reticle_target.visible = false;
+				scene.add( reticle_target );
+
+				reticle = new THREE.Mesh(
+					BufferGeometryUtils.mergeBufferGeometries([ring, dot]),
+					new THREE.MeshBasicMaterial()
+				);
+				//reticle.matrixAutoUpdate = false;
 				reticle.visible = false;
 				scene.add( reticle );
 
@@ -480,69 +689,129 @@
 				
 
 				renderer.domElement.addEventListener('touchstart', function(e){
+          
+           switch(e.touches.length){
+              
+            case 1:
+               
+                //選擇模式
+                  if(modeindex == 1 && reticle.visible == false){ 
+                    e.preventDefault();
+                    
+                    dControl.deactivate();
+                    
+                    touchDown=true;
+                    clickMouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+                    clickMouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
 
-					if(modeindex == 0 && reticle.visible == true){
-						e.preventDefault();
-						touchDown=true;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
-					}
-					//選擇模式
-					else if(modeindex == 1 &&reticle.visible == false){ 
-						e.preventDefault();
-						touchDown=true;
-						clickMouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
-						clickMouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
-						
-						raycaster.setFromCamera(clickMouse,camera);
-						const found = raycaster.intersectObjects(scene.children);
-						if(found.length > 0 && found[0].object.userData.draggable){
-						draggable = found[0].object;
-						draggable.material.set(0x535353);
-						}
-						const getp = document.querySelector("P");
-						getp.textContent = "找到" + draggable.userData.name;   
-					}
+                    raycaster.setFromCamera(clickMouse,camera);
+                    found = raycaster.intersectObjects(scene.children);
+
+                        if(found.length > 0 && found[0].object.userData.draggable){
+                        draggable = found[0].object;
+                        draggable.material.color.set(0x535353);
+                        dControl = new DragControls([draggable],camera,renderer.domElement);
+                        }
+                        else{
+                          draggable.material.color.set(0xffffff);
+                        }
+
+                    const getp = document.querySelector("P");
+                    getp.textContent = "找到" + draggable.userData.name; 
+                    
+                  }
+                  else if(modeindex == 2 && reticle.visible == false){
+                    e.preventDefault();
+                    dControl.activate();
+                  }
+                  break;
+               
+          case 2:
+               
+                  if(modeindex == 0 && reticle.visible == true){
+                  e.preventDefault();
+                  touchDown=true;
+                  touchX = e.touches[0].pageX;
+                  touchY = e.touches[0].pageY;
+                  }
+                  break;
+           }
+
 				}, false);
 
 				renderer.domElement.addEventListener('touchend', function(e){
-
-					if(modeindex == 0 && reticle.visible == true){
-						e.preventDefault();
-						touchDown = false;
-					}
-
-					else if(modeindex == 1 && target.userData.name == mesh_arr[0].userData.name && reticle.visible == false){
-						e.preventDefault();
-						touchDown = false;
-					}
+          
+            switch(e.touches.length){
+              
+            case 1:
+                  if(modeindex == 1 && reticle.visible == false){
+                  e.preventDefault();
+                  touchDown = false;
+                  }
+                  else if(modeindex == 2 && reticle.visible == false){
+                  e.preventDefault();
+                  dControl.deactivate();
+                  }
+                  break;
+            case 2:
+                  if(modeindex == 0 && reticle.visible == true){
+                  e.preventDefault();
+                  touchDown = false;
+                  dControl.deactivate();
+                  }
+                  break;
+            }
 
 				}, false);
 
 				renderer.domElement.addEventListener('touchmove', function(e){
-					if(modeindex == 0 && reticle.visible == true){
-						e.preventDefault();
-					
-						if(!touchDown){
-							return;
-						}
+          
+          switch(e.touches.length){
+              
+            case 1:
+                    if(modeindex == 2 && reticle.visible == false){
+                    e.preventDefault();
+                    dControl.activate();
+                    }
+                    break;
+            case 2:
+                    if(modeindex == 0 && reticle.visible == true){
 
-						deltaX = e.touches[0].pageX - touchX;
-						deltaY = e.touches[0].pageY - touchY;
-						touchX = e.touches[0].pageX;
-						touchY = e.touches[0].pageY;
+                      e.preventDefault();
 
-						scaleObject();
+                      if(!touchDown){
+                            return;
+                      }
 
-					}
+                      deltaX = e.touches[0].pageX - touchX;
+                      deltaY = e.touches[0].pageY - touchY;
+                      touchX = e.touches[0].pageX;
+                      touchY = e.touches[0].pageY;
 
+                      rotateObject();
+                    }
+          
+                  else if(modeindex == 1 &&reticle.visible == false){ 
+
+                      e.preventDefault();
+                      if(!touchDown){return;}
+
+                      deltaX = e.touches[0].pageX - touchX;
+                      deltaY = e.touches[0].pageY - touchY;
+                      touchX = e.touches[0].pageX;
+                      touchY = e.touches[0].pageY;
+
+                      const getp = document.querySelector("P");
+                      getp.textContent = deltaX;  
+
+                      Mode01_rotateObject();
+
+                  }
+                  break;
+              } 
 				}, false);
 
 				//
-				//選擇模式
-				window.addEventListener("click",event =>{
-					
-				});
 	
 				//
 		}
@@ -550,14 +819,18 @@
 
 		//
 
-		var touchDown, touchX, touchY, deltaX, deltaY;
-
 		function rotateObject(){
-			if(mesh && reticle.visible){
-				mesh.rotation.y += deltaX / 100;
+        if(mesh_arr[mesh_index] && reticle.visible == true){
+          mesh_arr[mesh_index].rotation.z += deltaY / 100;
+        }
+		}
+      
+		function Mode01_rotateObject(){
+		if(reticle.visible == false && modeindex == 1){
+			draggable.rotation.z += deltaY / 100;
 			}
 		}
-		
+
 		function scaleObject(){
 			if(mesh_arr[mesh_index] && reticle.visible){
 				mesh_arr[mesh_index].scale.x += deltaX / 100;
@@ -600,47 +873,68 @@
 		}
 
 			//
-		function Mode01_scaleObject(a){
+		function Mode01_scaleObject(){
 
-			mesh_arr[a].scale.x += deltaX / 100;
-			mesh_arr[a].scale.y += deltaX / 100;
-			mesh_arr[a].scale.z += deltaX / 100;
+			draggable.scale.x += deltaX / 100;
+			draggable.scale.y += deltaX / 100;
+			draggable.scale.z += deltaX / 100;
 
-				if(mat_arr[a].map == tex_arr[0]){
-					//tex_arr[0].repeat.x += deltaX / 100;
-					//tex_arr[0].repeat.y += deltaX / 100;
-					mat_arr[a].map.repeat.x += deltaX / 100;
-					mat_arr[a].map.repeat.y += deltaX / 100;
-					//tex_arr[0].needsUpdate = true;
-					mat_arr[a].needsUpdate = true;
+				if(draggable.material.map == tex_arr[0]){
+
+					draggable.material.map.repeat.x += deltaX / 100;
+					draggable.material.map.repeat.y += deltaX / 100;
+					draggable.material.needsUpdate = true;
 				}
-				else if((mat_arr[a].map == tex_arr[1])){
-					//tex_arr[1].repeat.x += deltaX / 100;
-					//tex_arr[1].repeat.y += deltaX / 100;
-					mat_arr[a].map.repeat.x += deltaX / 100;
-					mat_arr[a].map.repeat.y += deltaX / 100;
-					//tex_arr[1].needsUpdate = true;
-					mat_arr[a].needsUpdate = true;
+				else if((draggable.map == tex_arr[1])){
+
+					draggable.material.map.repeat.x += deltaX / 100;
+					draggable.material.map.repeat.y += deltaX / 100;
+					draggable.material.needsUpdate = true;
 				}
 				else if((mat_arr[a].map == tex_arr[2])){
-					//tex_arr[2].repeat.x += deltaX / 100;
-					//tex_arr[2].repeat.y += deltaX / 100;
-					mat_arr[a].map.repeat.x += deltaX / 100;
-					mat_arr[a].map.repeat.y += deltaX / 100;
-					//tex_arr[2].needsUpdate = true;
-					mat_arr[a].needsUpdate = true;
+
+					draggable.material.map.repeat.x += deltaX / 100;
+					draggable.material.map.repeat.y += deltaX / 100;
+					draggable.material.needsUpdate = true;
 				}
 				else{
-					//tex_arr[3].repeat.x += deltaX / 100;
-					//tex_arr[3].repeat.y += deltaX / 100;
-					mat_arr[a].map.repeat.x += deltaX / 100;
-					mat_arr[a].map.repeat.y += deltaX / 100;
-					//tex_arr[3].needsUpdate = true;
-					mat_arr[a].needsUpdate = true;
+          
+					draggable.material.map.repeat.x += deltaX / 100;
+					draggable.material.map.repeat.y += deltaX / 100;
+					draggable.material.needsUpdate = true;
 				}
 		}
 			//
+			function getCenterPoint(points) {
+            let line = new THREE.Line3(...points)
+            return line.getCenter( new THREE.Vector3() );
+            }
+            //
+            function initLine(point) {
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0xffffff,
+                linewidth: 5,
+                linecap: 'round'
+            });
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints([point, point]);
+            return new THREE.Line(lineGeometry, lineMaterial);
+            }
+            //
+            function updateLine(matrix, line) {
+            const positions = line.geometry.attributes.position.array;
+            positions[3] = matrix.elements[12]
+            positions[4] = matrix.elements[13]
+            positions[5] = matrix.elements[14]
+            line.geometry.attributes.position.needsUpdate = true;
+            line.geometry.computeBoundingSphere();
+            }
+            //
 
+            function getDistance(points) {
+            if (points.length == 2) return points[0].distanceTo(points[1]);
+            }
+
+			//
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -655,7 +949,6 @@
 			function animate() {
 
 				renderer.setAnimationLoop( render );
-				requestAnimationFrame(animate);
 
 			}
 
@@ -685,12 +978,15 @@
 
 							document.getElementById("place-button").style.display = "none";
 							document.getElementById("complete-button").style.display = "none";
+							document.getElementById("btn_zoomon").style.display = "none";
+							document.getElementById("btn_zoomdown").style.display = "none";    
 
 							reticle.visible = false;
+              				reticle_target.visible = false;
 
 						} );
 
-						hitTestSourceRequested = true;
+							hitTestSourceRequested = true;
 
 					}
 
@@ -698,20 +994,41 @@
 
 						const hitTestResults = frame.getHitTestResults( hitTestSource );
 
-						if ( hitTestResults.length && modeindex == 0 ) {
+						if ( hitTestResults.length && modeindex == 0) {
 
-							const hit = hitTestResults[ 0 ];
-
-							document.getElementById("place-button").style.display = "block";
-							document.getElementById("complete-button").style.display = "block";
+						const hit = hitTestResults[ 0 ];
+						reticle_target.matrix.fromArray( hit.getPose( referenceSpace ).transform.matrix );
+						reticle_target.getWorldPosition(worldposition);
+                
+              
+						if(start_index == 0){
+						reticle_target.visible = true;
+						document.getElementById("place-button").style.display = "block";
+						}
+						else if(start_index == 1){
+							reticle_target.visible = false;
 							reticle.visible = true;
-							reticle.matrix.fromArray( hit.getPose( referenceSpace ).transform.matrix );
+							document.getElementById("place-button").style.display = "block";
+							reticle.position.x = worldposition.x;
+							reticle.position.y = posY;
+							reticle.position.z = worldposition.z;
+							if (currentLine) updateLine(reticle.matrix, currentLine);
+
+								/*if(start_index == 1 && mode02_index == 1){
+
+								if (currentLine) updateLine(reticle.matrix, currentLine);
+								}*/
+						}
+
 
 						} else {
 
 							reticle.visible = false;
+ 				            reticle_target.visible = false;
 							document.getElementById("place-button").style.display = "none";
 							document.getElementById("complete-button").style.display = "none";
+							document.getElementById("zoom_on").style.display = "none";
+							document.getElementById("zoom_down").style.display = "none";    
 
 						}
 

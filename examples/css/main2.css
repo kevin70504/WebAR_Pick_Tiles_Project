@@ -1,7 +1,7 @@
 body {
     font-family: "Lato", sans-serif;
-    background-color: #000000;
-    color: #ffffff;
+    background-color: #000;
+    color: #fff;
   }
   
   .sidenav {
@@ -11,7 +11,7 @@ body {
     z-index: 1;
     top:  0;
     left: 0;
-    background-color: #111111;
+    background-color: #111;
     overflow-x: hidden;
     transition: 0.5s;
     padding-top: 60px;
@@ -75,7 +75,7 @@ body {
     #place-button{left: calc(44%);font-size:1px;}
     #measurement{left: calc(30%);font-size:1px;}
     #delete{left: calc(55%);font-size:1px;}
-    span{font-size:15px;}
+    span{font-size:30px;}
   }
   @media screen and (min-width: 1024px) {
     .sidenav {padding-top: 15px;}
@@ -93,7 +93,7 @@ body {
   }
 
   a {
-    color: #ffff00;
+    color: #ff0;
     text-decoration: none;
   }
   
@@ -162,7 +162,7 @@ body {
   #notSupported {
     width: 50%;
     margin: auto;
-    background-color: #ff0000;
+    background-color: #f00;
     margin-top: 20px;
     padding: 10px;
   }
@@ -200,21 +200,21 @@ body {
     right: 20px;
     width: 130px;
     height: 40px;
-    display: none;
+    display: block;
   }
   #SwitchDisplayText{
     right: 20px;
     width: 130px;
     height: 40px;
-    display: none;
+    display: block;
   }
   .SampleButton{
     position: absolute;
     padding: 12px 6px;
-    border: 1px solid #ffffff;
+    border: 1px solid #fff;
     border-Radius: 8px;
     background: rgba(0,0,0,0.1);
-    color: #ffffff;
+    color: #fff;
     font:normal 16px sans-serif;
     text-Align: center;
     opacity: 0.5;
@@ -225,7 +225,7 @@ body {
     position: absolute;
     padding: 12px 6px;
     background: rgba(0,0,0,0.1);
-    color: #ffffff;
+    color: #fff;
     font:normal 13px sans-serif;
     text-Align: center;
     opacity: 0.5;

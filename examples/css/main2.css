@@ -69,12 +69,12 @@ body {
     .sidenav img {width:60px;}
     .SampleText{left: calc(34%); top: 100px;}
     #edittext{top: 40px; left: calc(41%); width: 140px;}
-    #editmode{width:80px;top: 100px;font-size:8px;}
-    #SwitchRotateResize{top: 150px;font-size:8px;}
-    #SwitchDisplayText{top: 200px; font-size:8px;}
-    #place-button{left: calc(44%);font-size:8px;}
-    #measurement{left: calc(30%);font-size:8px;}
-    #delete{left: calc(55%);font-size:8px;}
+    #editmode{width:80px;top: 100px;font-size:12px;}
+    #SwitchRotateResize{top: 150px;font-size:12px;}
+    #SwitchDisplayText{top: 200px; font-size:12px;}
+    #place-button{left: calc(44%);font-size:12px;}
+    #measurement{left: calc(30%);font-size:12px;}
+    #delete{left: calc(55%);font-size:12px;}
     span{font-size:30px;}
   }
   @media screen and (min-width: 1024px) {

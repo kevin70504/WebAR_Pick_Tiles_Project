@@ -4,7 +4,7 @@
 		<title>three.js ar - hit test</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<link type="text/css" rel="stylesheet" href="./css/main.css">
+		<link type="text/css" rel="stylesheet" href="./css/main2.css">
 	</head>
 	<body>
 
@@ -25,6 +25,8 @@
 				<img src="https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles03.jpeg">
 				<a class="ar-texture" id="ChangeTextureButton04" href="#">磁磚04</a>
 				<img src="https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles04.jpeg">
+                <a id="saveScene" href="#">SaveScene</a>
+                <a id="loadScene" href="#">LoadScene</a>
 			</div>
 			<div id="container" style="position: fixed;"></div>
 			<div class="SampleText" id="edittext">編輯模式開啟</div>
@@ -33,18 +35,16 @@
 			<p class="SampleText" id="step03_PlaceTiles">請選擇要放置的磁磚</p>
 			<p class="SampleText" id="step04_SelectEditTiles">請選擇需要編輯的磁磚</p>
 	
-		<span style="font-size:30px;cursor:pointer;position: absolute;" onclick="openNav()">&#9776; open</span>
-		
-		<button type="button" class="SampleButton" id="place-button">設置基準線</button>
-		<button type="button" class="SampleButton" id="editmode">編輯模式</button>
-		<button type="button" class="SampleButton" id="delete">移除磁磚</button>
-		<button type="button" class="SampleButton" id="measurement">計算尺寸</button>
-		<button type="button" class="SampleButton" id="SwitchRotateResize">旋轉/縮放</button>
-		<button type="button" class="SampleButton" id="SwitchDisplayText">顯示/隱藏 尺寸</button>
-
+            <span style="cursor:pointer;position: absolute;" onclick="openNav()">&#9776; open</span>
+            
+            <button type="button" class="SampleButton" id="place-button">設置基準線</button>
+            <button type="button" class="SampleButton" id="editmode">編輯模式</button>
+            <button type="button" class="SampleButton" id="delete">移除磁磚</button>
+            <button type="button" class="SampleButton" id="measurement">計算尺寸</button>
+            <button type="button" class="SampleButton" id="SwitchRotateResize">旋轉/縮放</button>
+            <button type="button" class="SampleButton" id="SwitchDisplayText">顯示/隱藏 尺寸</button>
 
 		</div>
-
 
 		<script>
 		  function openNav() {
@@ -262,9 +262,9 @@
 			import { DragControls } from "./jsm/controls/DragControls.js"
 			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 			import { FontLoader} from './jsm/loaders/FontLoader.js';
-			import { GLTFExporter} from '../js/GLTFExporter.js'
-			import { GLTFLoader } from '../js/GLTFLoader.js'
-			import { LoadingBar } from '../js/LoadingBar.js'
+			import { GLTFExporter} from './jsm/loaders/GLTFExporter.js'
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js'
+			import { LoadingBar } from './jsm/loaders/LoadingBar.js'
 
 			let container;
 			let camera, scene, renderer;
@@ -321,6 +321,8 @@
 			let draggable = THREE.Object3D;
 			//drag
 			let dControl;
+            // loading
+            let loadingBar = new LoadingBar();;
 
 			init();
 			animate();
@@ -344,6 +346,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -396,6 +399,17 @@
 				const btn_SwitchDisplayMeasurementText = document.getElementById("SwitchDisplayText");
 				btn_SwitchDisplayMeasurementText.addEventListener("click",SwitchDisplayMeasurementText);
 				//
+                loadingBar.visible =false;
+                const btn_saveScene = document.getElementById("saveScene").addEventListener("click",function(){
+                    reticle.visible = false;          
+                    exportScene(scene);
+                    reticle.visible = true;
+                });
+                const btn_loadScene = document.getElementById("loadScene").addEventListener("click",function(){
+                    loadingBar.visible = true;
+                    importScene(scene);
+                });
+                //
 
         		let ring = new THREE.RingBufferGeometry(0.045, 0.05, 32).rotateX(- Math.PI / 2);
 				let dot = new THREE.CircleBufferGeometry(0.005, 32).rotateX(- Math.PI / 2);
@@ -432,7 +446,50 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
+            //
+            function exportScene (input){
+                let exporter = new GLTFExporter();
+                exporter.parse(input,function(result){
+                    localStorage.setItem("scene",JSON.stringify(result, null, 2));
+                });
+            }
 
+            function importScene(input){
+                const manager = new THREE.LoadingManager();
+                const sceneLoader = new GLTFLoader(manager);
+
+                const json = localStorage.getItem('scene');
+
+                manager.onLoad = function ( ) {
+
+                console.log( 'Loading complete!');
+
+                };
+                manager.onProgress = function (item, loaded, total) {
+                
+                loadingBar.progress = loaded/total;
+                console.log( 'Loading complete'+(loaded/total*100)+'%' );
+
+                };
+                manager.onError = function ( item ) {
+
+                console.log( 'There was an error loading ' + item );
+
+                };
+
+                sceneLoader.parse(
+                    json,
+                    ".",
+                    function(obj){
+                            for (let index = 1; index < obj.scene.children.length-1; index++) {
+                                obj.scene.children[index].children[1].userData.export = true;
+                                console.log(obj.scene.children[index].children[1]+"完成");
+                            }
+                            scene.add( obj.scene );
+                            loadingBar.visible = false;
+                        }
+                        );
+                    }
 			//
             function LoadCubeTexture(TextureCubeContainer,TextureCubeAdress)
             {
@@ -441,6 +498,7 @@
 				TextureCubeAdress,
 				function(TextureCubeContainer){
 					TextureCubeContainer.wrapS = TextureCubeContainer.wrapT = THREE.RepeatWrapping;
+                    TextureCubeContainer.encoding = THREE.sRGBEncoding;
 					TextureCubeContainer.offset.set(0,0);
 					TextureCubeContainer.repeat.set(2,2);
 				},
@@ -478,6 +536,7 @@
                         mesh_arr[mesh_index].position.set(-0.25,0,0.25);
                         mesh_arr[mesh_index].visible = true;
                         mesh_arr[mesh_index].userData.draggable = true;
+                        mesh_arr[mesh_index].userData.export = false;
                         mesh_arr[mesh_index].userData.name = 'Tilies '+ mesh_index;
 
                         const Planes_Group = new THREE.Group();
@@ -753,6 +812,8 @@
 				draggable.scale.x = 0.2;
 				draggable.scale.y = 0.2;
 				draggable.scale.z = 0.2;
+                draggable.material.map.repeat.x = 0.2;
+                draggable.material.map.repeat.y = 0.2;
 				}
 				draggable.material.map.repeat.x -= curDiff / 500;
 				draggable.material.map.repeat.y -= curDiff / 500;
@@ -855,17 +916,6 @@
  				            reticle_target.visible = false;
 							document.getElementById("place-button").style.display = "none";
 
-						}
-
-						/*if(!mesh_arr == null){
-							for (let index = 0; index < mesh_arr.length; index++) {
-								mesh_arr[index].position.y = posY;
-							}
-						}*/
-						if(!text_arr == null){
-							for (let index = 0; index < text_arr.length; index++) {
-								text_arr[index].scale.set(2,2,2);
-							}
 						}
 					}
 				}

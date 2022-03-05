@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js ar - hit test</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="./css/main2.css">
+	</head>
+	<body>
+
+		<div id="content">
+		
+			<div id="mySidenav" class="sidenav">
+				<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+
+				<a href="#eng" data-reload>English </a>
+				<a href="#ch" data-reload>中文 </a>
+				<a href="#nl" data-reload>Dutch </a>
+
+				<a class="ar-texture" id="ChangeTextureButton01" href="#">磁磚01</a>
+				<img src="https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles01.jpeg">
+				<a class="ar-texture" id="ChangeTextureButton02" href="#">磁磚02</a>
+				<img src="https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles02.jpeg">
+				<a class="ar-texture" id="ChangeTextureButton03" href="#">磁磚03</a>
+				<img src="https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles03.jpeg">
+				<a class="ar-texture" id="ChangeTextureButton04" href="#">磁磚04</a>
+				<img src="https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles04.jpeg">
+                <a id="saveScene" href="#">SaveScene</a>
+                <a id="loadScene" href="#">LoadScene</a>
+			</div>
+			<div id="container" style="position: fixed;"></div>
+			<div class="SampleText" id="edittext">編輯模式開啟</div>
+			<p class="SampleText" id="P">請點擊AR按鈕，等待基準線顯示</p>
+			<p class="SampleText" id="step02_PlaceWallTarget">請對準牆面與地板接縫</p>
+			<p class="SampleText" id="step03_PlaceTiles">請選擇要放置的磁磚</p>
+			<p class="SampleText" id="step04_SelectEditTiles">請選擇需要編輯的磁磚</p>
+	
+            <span style="cursor:pointer;position: absolute;" onclick="openNav()">&#9776; open</span>
+            
+            <button type="button" class="SampleButton" id="place-button">設置基準線</button>
+            <button type="button" class="SampleButton" id="editmode">編輯模式</button>
+            <button type="button" class="SampleButton" id="delete">移除磁磚</button>
+            <button type="button" class="SampleButton" id="measurement">計算尺寸</button>
+            <button type="button" class="SampleButton" id="SwitchRotateResize">旋轉/縮放</button>
+            <button type="button" class="SampleButton" id="SwitchDisplayText">顯示/隱藏 尺寸</button>
+		</div>
+
+        <script>
+            function openNav()
+            {
+                document.getElementById("mySidenav").style.width = "180px";
+            }
+		  
+            function closeNav() {
+                document.getElementById("mySidenav").style.width = "0";
+            }
+        </script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { ARButton } from './jsm/webxr/ARButton.js';
+			import { DragControls } from "./jsm/controls/DragControls.js"
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import { FontLoader} from './jsm/loaders/FontLoader.js';
+			import { GLTFExporter} from './jsm/loaders/GLTFExporter.js'
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js'
+			import { LoadingBar } from './jsm/loaders/LoadingBar.js'
+
+			let container;
+			let camera, scene, renderer;
+			let controller;
+
+            let start_index = 0;
+
+			let hitTestSource = null;
+			let hitTestSourceRequested = false;
+
+			let mesh,material;
+			let mesh_index = 0;
+			let texture,texture2,texture3,texture4;
+			let mesh_arr = [];
+            let tex_arr = [];
+            let mat_arr = [];
+			let mat_index = 0;
+			let index = 0;
+
+			let mode02_index = 0 ;
+			let worldposition = new THREE.Vector3();
+			let gettargetworldposition = new THREE.Vector3();
+			// position limit
+            let posY,targetposX;
+            var groundPlane;
+            var setupStepLocateFloorY = 1,setupStepLocateFloorX = 2,setupStepLocateFloorZ = 3, setupStepLocateCenter = 4;
+            var setupSteps = setupStepLocateFloorY;
+            var scanPointY,scanPointX,scanPointZ;
+            var scantarget_Y,scantarget_X,scantarget_Z;
+            var worldCenterLocation = new THREE.Vector3();
+            var worldYPosition = 0;
+            var worldXPosition = 0;
+            var worldZPosition = 0;
+            var worldCenterLocation_arry = [];
+            var currentLine;
+            let AreaPoint3,AreaPoint4;
+
+			// 3dtext
+			let textmesh;
+			let text_message = "";
+			let text_arr = [];
+            let text_index = 0;
+			let SwitchDisplayMeasurementText_Index = 0;
+			let workingVec3 = new THREE.Vector3();
+			let getWorldScaleVec3 = new THREE.Vector3();
+			let ObjectHightDistance = 0;
+			let ObjectWidthDistance = 0;
+
+            // Is this how java script does eneums?
+            let ModeCreateTile = 0;
+            let ModeSelect = 1;
+			let ModeSelect_Rotate = 2;
+			let ModeSelect_Resize = 3;
+			let modeSelectindex = ModeSelect_Rotate;
+            let modeindex = ModeCreateTile;
+
+            //touch
+            let touchDown, touchX, touchY, deltaX, deltaY;
+			let curDiff;
+			let prevDiff = -1;
+            //raycaster
+            let found;
+			let raycaster = new THREE.Raycaster();
+			let clickMouse = new THREE.Vector2();
+			let draggable = THREE.Object3D;
+			//drag
+			let dControl;
+            // loading
+            let loadingBar = new LoadingBar();;
+
+            //
+
+
+			init();
+			animate();
+
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.getElementById("container").appendChild( container );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
+
+				const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
+				light.position.set( 0.5, 1, 0.25 );
+				scene.add( light );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.xr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				let options ={
+					requiredFeatures:['hit-test'],
+					optionalFeatures:['dom-overlay'],
+				}
+
+				options.domOverlay = { root: document.getElementById('content')};				
+				//document.body.appendChild( ARButton.createButton( renderer, { requiredFeatures: [ 'hit-test' ] } ) );
+				document.body.appendChild(ARButton.createButton(renderer,options));
+
+				//
+                texture  =  LoadCubeTexture(texture,   "https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles01.jpeg?v=1638944482701");
+                texture2 =  LoadCubeTexture(texture2,  "https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles02.jpeg?v=1638944483969");
+                texture3 =  LoadCubeTexture(texture3,  "https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles03.jpeg?v=1638944486359");
+                texture4 =  LoadCubeTexture(texture4,  "https://cdn.glitch.me/b138d56c-40db-431d-8c8f-c55c76f583db%2FTiles04.jpeg?v=1638944489229");
+				tex_arr.push(texture,texture2,texture3,texture4);
+				//
+                SetupButtonClickEvent("ChangeTextureButton01",0,false,true,true,true);
+                SetupButtonClickEvent("ChangeTextureButton02",1,true,false,true,true);
+                SetupButtonClickEvent("ChangeTextureButton03",2,true,true,false,true);
+                SetupButtonClickEvent("ChangeTextureButton04",3,true,true,true,false);
+				//
+				const setbtn = document.getElementById("place-button");
+				setbtn.addEventListener("click",function(){
+                    if ( scantarget_Y.visible ) 
+                    {
+                        scantarget_Y.getWorldPosition(worldCenterLocation);
+                        const pt = new THREE.Vector3();
+                        pt.setFromMatrixPosition(scantarget_Y.matrix);
+                        worldCenterLocation_arry.push(pt);
+                        worldYPosition = worldCenterLocation.y;
+                        worldZPosition = worldCenterLocation.z;
+                        setupSteps = setupStepLocateFloorX;
+                        
+                        scanPointY.visible = true;
+                        scanPointY.position.setFromMatrixPosition( scantarget_Y.matrix );
+                    }
+                    else if ( scantarget_X.visible)
+                    {
+                        scantarget_X.getWorldPosition(worldCenterLocation);
+                        worldXPosition = worldCenterLocation.x;
+                        setupSteps = setupStepLocateFloorZ;
+                        scanPointX.visible = true;
+                        scanPointX.position.setFromMatrixPosition( scantarget_X.matrix );
+                        worldCenterLocation_arry.push(scanPointX.position);
+                        currentLine = initLine(worldCenterLocation_arry[0],worldCenterLocation_arry[1]);
+                        scene.add(currentLine);
+                        
+                    }
+
+                    else if ( scantarget_Z.visible )
+                    {
+                        scantarget_Z.getWorldPosition(worldCenterLocation);
+                        worldZPosition = worldCenterLocation.z;
+                        //scanPointZ.visible = true;
+                        scanPointZ.position.setFromMatrixPosition( scantarget_Z.matrix );
+                        worldCenterLocation_arry.push(scanPointZ.position);
+                        currentLine = initLine(worldCenterLocation_arry[1],worldCenterLocation_arry[2]);
+                        scene.add(currentLine);
+
+                        UpdateArea(worldCenterLocation_arry[1], worldCenterLocation_arry[0], worldCenterLocation_arry[1], 
+                        worldCenterLocation_arry[0], 0.05,worldCenterLocation_arry[2]);
+  
+                        currentLine = initLine(worldCenterLocation_arry[2],AreaPoint3);
+                        scene.add(currentLine);
+                        
+                        UpdateArea(worldCenterLocation_arry[1],worldCenterLocation_arry[2],worldCenterLocation_arry[1],
+                        worldCenterLocation_arry[2],0.05,worldCenterLocation_arry[0]);
+                        
+                        currentLine = initLine(worldCenterLocation_arry[0],AreaPoint4);
+                        scene.add(currentLine);
+
+                        /*
+                        const GetStep02Text = (document.querySelector("#step02_PlaceWallTarget").style.display = "none"); // Update Some Text?
+                        const GetStep03Text = (document.querySelector("#step03_AddTiles").style.display = "block"); // Update Some Text?
+                        const GetStep03Text_2 = (document.querySelector("#UpdateTile-button").style.display = "block"); // Upd
+                        */
+                    }
+			    });
+				//
+			
+				const btn_delete = document.getElementById("delete");
+				btn_delete.addEventListener("click",function(){scene.remove(draggable.parent);});
+				//
+				const btn_measurement = document.getElementById("measurement");
+				btn_measurement.addEventListener("click",CreateMeasurementText);
+				//
+				const btn_switchRotateResize = document.getElementById("SwitchRotateResize");
+				btn_switchRotateResize.addEventListener("click",SwitchRotateResize);
+                //
+				const btn_SwitchDisplayMeasurementText = document.getElementById("SwitchDisplayText");
+				btn_SwitchDisplayMeasurementText.addEventListener("click",SwitchDisplayMeasurementText);
+				//
+                loadingBar.visible =false;
+                const btn_saveScene = document.getElementById("saveScene").addEventListener("click",function(){
+                    reticle.visible = false;          
+                    exportScene(scene);
+                    reticle.visible = true;
+                });
+                const btn_loadScene = document.getElementById("loadScene").addEventListener("click",function(){
+                    loadingBar.visible = true;
+                    importScene(scene);
+                });
+                //
+                let scanPoint_geo = new THREE.SphereBufferGeometry(0.05,32,16);
+                let scanPoint_mat = new THREE.MeshBasicMaterial();
+                let scanPoint2_mat = new THREE.MeshBasicMaterial({color:0x323242});
+                let scanPoint3_mat = new THREE.MeshBasicMaterial({color:0x324232});
+                
+                scanPointY = new THREE.Mesh(scanPoint_geo,scanPoint_mat);
+                scanPointY.visible = false;
+                scene.add(scanPointY);
+                
+                scanPointX = new THREE.Mesh(scanPoint_geo,scanPoint2_mat);
+                scanPointX.visible = false;
+                scene.add(scanPointX);
+                
+                scanPointZ = new THREE.Mesh(scanPoint_geo,scanPoint3_mat);
+                scanPointZ.visible = false;
+                scene.add(scanPointZ);
+                //
+
+        		let ring = new THREE.RingBufferGeometry(0.045, 0.05, 32).rotateX(- Math.PI / 2);
+				let dot = new THREE.CircleBufferGeometry(0.005, 32).rotateX(- Math.PI / 2);
+
+                scantarget_Y = new THREE.Mesh(BufferGeometryUtils.mergeBufferGeometries([ring, dot]),new THREE.MeshBasicMaterial());
+                scantarget_Y.visible = false;
+                scantarget_Y.matrixAutoUpdate = false;
+                scene.add(scantarget_Y);
+                
+                scantarget_X = new THREE.Mesh(BufferGeometryUtils.mergeBufferGeometries([ring, dot]),new THREE.MeshBasicMaterial());
+                scantarget_X.visible = false;
+                scene.add(scantarget_X);
+                
+                scantarget_Z = new THREE.Mesh(BufferGeometryUtils.mergeBufferGeometries([ring, dot]),new THREE.MeshBasicMaterial());
+                scantarget_Z.visible = false;
+                scene.add(scantarget_Z);
+				//
+				window.addEventListener( 'resize', onWindowResize, false );
+                // Setting up the touch input events.
+                renderer.domElement.addEventListener('touchstart', ScreenTouchStart,  false);
+				renderer.domElement.addEventListener('touchend',   ScreenTouchEnd,    false);
+				renderer.domElement.addEventListener('touchmove',  ScreenTouchMove,   false);
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+            //
+            function UpdateArea(sourceA_X,sourceB_X,sourceA_Z,sourceB_Z,offset,target){
+                const twoPointsXDis = (sourceA_X.x - sourceB_X.x) - offset;  
+                const twoPointsZDis = sourceA_Z.z - sourceB_Z.z;
+                if(AreaPoint3 == null){
+                    AreaPoint3 = new THREE.Vector3(target.x - twoPointsXDis,worldYPosition,target.z - twoPointsZDis);
+                }
+                else{
+                    AreaPoint4 = new THREE.Vector3(target.x - twoPointsXDis,worldYPosition,target.z - twoPointsZDis);
+                }
+            }
+            //
+            function exportScene (input){
+                let exporter = new GLTFExporter();
+                exporter.parse(input,function(result){
+                    localStorage.setItem("scene",JSON.stringify(result, null, 2));
+                });
+            }
+
+            function importScene(input){
+                const manager = new THREE.LoadingManager();
+                const sceneLoader = new GLTFLoader(manager);
+
+                const json = localStorage.getItem('scene');
+
+                manager.onLoad = function ( ) {
+
+                console.log( 'Loading complete!');
+
+                };
+                manager.onProgress = function (item, loaded, total) {
+                
+                loadingBar.progress = loaded/total;
+                console.log( 'Loading complete'+(loaded/total*100)+'%' );
+
+                };
+                manager.onError = function ( item ) {
+
+                console.log( 'There was an error loading ' + item );
+
+                };
+
+                sceneLoader.parse(
+                    json,
+                    ".",
+                    function(obj){
+                            for (let index = 1; index < obj.scene.children.length-1; index++) {
+                                obj.scene.children[index].children[1].userData.export = true;
+                                console.log(obj.scene.children[index].children[1]+"完成");
+                            }
+                            scene.add( obj.scene );
+                            loadingBar.visible = false;
+                        }
+                        );
+                    }
+			//
+            function LoadCubeTexture(TextureCubeContainer,TextureCubeAdress)
+            {
+                const textureloader = new THREE.TextureLoader();
+				return textureloader.load(
+				TextureCubeAdress,
+				function(TextureCubeContainer){
+					TextureCubeContainer.wrapS = TextureCubeContainer.wrapT = THREE.RepeatWrapping;
+                    TextureCubeContainer.encoding = THREE.sRGBEncoding;
+					TextureCubeContainer.offset.set(0,0);
+					TextureCubeContainer.repeat.set(2,2);
+				},
+				function(err){
+					console.log("ERROR: Failed to load Texture.");
+				});
+            }
+            //
+            function SetupButtonClickEvent(ElementID,MatID,ShouldDisposeTexture1,ShouldDisposeTexture2,ShouldDisposeTexture3,ShouldDisposeTecture4)
+            {
+                const matbt = document.getElementById(ElementID);  
+                matbt.addEventListener("click",function()
+                {
+                    switch (modeindex)
+                    {
+                    case ModeCreateTile:
+                        {
+                        console.log(' create tile mode ')
+                        // this code will run when we are in the Create tile mode
+                        /*
+                        mat_arr[mat_index].map = tex_arr[MatID]
+                        if (ShouldDisposeTexture1) tex_arr[0].dispose();  else tex_arr[0].needsUpdate = true;
+                        if (ShouldDisposeTexture2) tex_arr[1].dispose();  else tex_arr[1].needsUpdate = true;
+                        if (ShouldDisposeTexture3) tex_arr[2].dispose();  else tex_arr[2].needsUpdate = true;
+                        if (ShouldDisposeTecture4) tex_arr[3].dispose();  else tex_arr[3].needsUpdate = true;
+                        mat_arr[mat_index].needsUpdate = true;
+                        */
+                        if(worldCenterLocation_arry[0] === null){ return };
+                        const PlaneGeometry = new THREE.PlaneBufferGeometry(0.5,0.5);
+                        const PlaneMaterial = new THREE.MeshBasicMaterial( { map:tex_arr[MatID],side:THREE.DoubleSide } );
+                        mat_arr.push(PlaneMaterial);
+                        const PlaneMesh = new THREE.Mesh( PlaneGeometry, mat_arr[mat_index] ).rotateX( - Math.PI / 2 );
+                        mesh_arr.push(PlaneMesh);
+                        mesh_arr[mesh_index].position.set(-0.25,0,0.25);
+                        mesh_arr[mesh_index].visible = true;
+                        mesh_arr[mesh_index].userData.draggable = true;
+                        mesh_arr[mesh_index].userData.export = false;
+                        mesh_arr[mesh_index].userData.name = 'Tilies '+ mesh_index;
+
+                        const Planes_Group = new THREE.Group();
+                        Planes_Group.position.set(worldCenterLocation_arry[0].x, posY, worldCenterLocation_arry[0].z);
+                        Planes_Group.add(mesh_arr[mesh_index]);
+                        scene.add( Planes_Group );
+                        mat_index++;
+                        mesh_index++;
+                        break;
+                        }
+                        case ModeSelect:
+                        {
+                        console.log('modeSelect')
+                        // This code will run if we are in the select mode
+                        if(draggable.userData.draggable == false) return;
+                        
+                        draggable.material.map = tex_arr[MatID];
+                        if (ShouldDisposeTexture1)tex_arr[0].dispose(); else tex_arr[0].needsUpdate = true;
+                        if (ShouldDisposeTexture2)tex_arr[1].dispose(); else tex_arr[1].needsUpdate = true;
+                        if (ShouldDisposeTexture3)tex_arr[2].dispose(); else tex_arr[2].needsUpdate = true;
+                        if (ShouldDisposeTecture4)tex_arr[3].dispose(); else tex_arr[3].needsUpdate = true;
+                        draggable.material.needsUpdate = true;
+                        break;
+                        }
+                    }
+                })
+            }
+            //
+            
+			function CreateMeasurementText(text_message){
+				switch (modeindex){
+					case ModeSelect:
+					{
+						const getp = document.querySelector("p");
+						if(draggable.userData.draggable == false) {
+							return;
+						}
+						else{
+							const fontloader = new FontLoader();
+							fontloader.load( './fonts/helvetiker_regular.typeface.json', function ( font ) {
+							const color = 0x006699;
+							const matLite = new THREE.MeshBasicMaterial( {
+								color: color,
+								transparent: true,
+								opacity: 0.4,
+								side: THREE.DoubleSide
+							} );
+							draggable.getWorldScale(getWorldScaleVec3); 
+							//const message2 = "This use "+ message +" tiles";
+							text_message = "This use " + Math.round(getWorldScaleVec3.x*4) +" tile"
+											+"\nHight is "+ObjectHightDistance +" cm"
+											+"\nWidth is "+ObjectWidthDistance +" cm";
+							const shapes = font.generateShapes( text_message, 0.02 );
+							const textgeometry = new THREE.ShapeGeometry( shapes );
+							textgeometry.computeBoundingBox();
+							const xMid = - 0.5 * ( textgeometry.boundingBox.max.x - textgeometry.boundingBox.min.x );
+							textgeometry.translate( xMid, 0, 0 );
+							// make shape ( N.B. edge view not visible )
+							textmesh = new THREE.Mesh( textgeometry, matLite );
+							//textmesh.position.setFromMatrixPosition( workingVec3.matrix );
+							draggable.parent.getWorldPosition(workingVec3);
+							//textmesh.position.set(workingVec3.x,posY,workingVec3.z);
+							textmesh.position.set(-0.26,0.02,0.26);
+							textmesh.rotateX( -Math.PI/2 );
+							text_arr.push(textmesh);
+							draggable.parent.add(text_arr[text_index]);
+							//scene.add(textmesh);
+							text_index++;
+							});
+						}
+					}
+				}
+			}
+			//
+			function SwitchDisplayMeasurementText(){
+				if(SwitchDisplayMeasurementText_Index == 0){
+					console.log(SwitchDisplayMeasurementText_Index);
+					
+					for (let index = 0; index < text_arr.length; index++) {
+						text_arr[index].visible = true;
+					}
+					SwitchDisplayMeasurementText_Index ++
+				}
+				else{
+					console.log(SwitchDisplayMeasurementText_Index);
+					
+					for (let index = 0; index < text_arr.length; index++) {
+						text_arr[index].visible = false;
+					}
+					SwitchDisplayMeasurementText_Index = 0;
+				}
+			}
+			//
+            function ScreenTouchStart(TouchInfo){
+                
+				switch(TouchInfo.touches.length)
+				{
+					
+				}
+            }
+
+			function ScreenTouchEnd(TouchInfo){
+
+				switch(TouchInfo.touches.length){
+
+				}
+			}
+			function ScreenTouchMove(TouchInfo)
+			{
+				const getp = document.querySelector("P");
+				switch(TouchInfo.touches.length){
+					
+				} 
+			}  
+            //
+			function SwitchRotateResize(){
+				if(modeindex == ModeSelect && modeSelectindex == ModeSelect_Rotate) modeSelectindex = ModeSelect_Resize; 
+				else if(modeindex == ModeSelect && modeSelectindex == ModeSelect_Resize)modeSelectindex = ModeSelect_Rotate;
+			}
+			//
+			function ModeSelect_rotateObject(){
+				const getp = document.querySelector("P");
+				if(draggable.userData.draggable == false) {
+					return;
+				}	
+				else draggable.rotation.z += deltaY / 100;
+			}
+
+			function ModeSelect_ResizeObject_Add(){
+
+				if ( reticle.visible == false && modeindex == ModeSelect && modeSelectindex == ModeSelect_Resize) 
+       				{
+						draggable.scale.x += curDiff / 500;
+						draggable.scale.y += curDiff / 500;
+						draggable.scale.z += curDiff / 500;
+
+						draggable.material.map.repeat.x += curDiff / 500;
+						draggable.material.map.repeat.y += curDiff / 500;
+						draggable.material.needsUpdate = true;
+					}
+
+
+			}	
+			function ModeSelect_ResizeObject_Reduce(){
+				draggable.getWorldScale(getWorldScaleVec3); 
+				draggable.scale.x -= curDiff / 500;
+				draggable.scale.y -= curDiff / 500;
+				draggable.scale.z -= curDiff / 500;
+				if(draggable.scale.x <= 0.2){
+				draggable.scale.x = 0.2;
+				draggable.scale.y = 0.2;
+				draggable.scale.z = 0.2;
+                draggable.material.map.repeat.x = 0.2;
+                draggable.material.map.repeat.y = 0.2;
+				}
+				draggable.material.map.repeat.x -= curDiff / 500;
+				draggable.material.map.repeat.y -= curDiff / 500;
+				draggable.material.needsUpdate = true;
+			}
+
+			//
+			function getVectorDistance(TargetObject,VectorA_Index,VectorB_Index,VectorC_Index){
+				//獲取plane 頂點0、頂點1、頂點2的數值
+				const PlaneVectorA = new THREE.Vector3();
+				const PlaneVectorB = new THREE.Vector3();
+				const PlaneVectorC = new THREE.Vector3();
+				const attribute = TargetObject.geometry.attributes.position;
+				PlaneVectorA.fromBufferAttribute( attribute, VectorA_Index );
+				PlaneVectorA.applyMatrix4( TargetObject.matrix );
+				PlaneVectorB.fromBufferAttribute( attribute, VectorB_Index );
+				PlaneVectorB.applyMatrix4( TargetObject.matrix );
+				PlaneVectorC.fromBufferAttribute( attribute, VectorC_Index );
+				PlaneVectorC.applyMatrix4( TargetObject.matrix );
+
+				//獲取頂點0到頂點1(寬度)的距離
+				const VectorWidthDistance = PlaneVectorA.distanceTo(PlaneVectorB);
+				ObjectHightDistance = Math.round((VectorWidthDistance*100));
+				//獲取頂點0到頂點2(高度)的距離
+				const VectorHightDistance = PlaneVectorA.distanceTo(PlaneVectorC);
+				ObjectWidthDistance = Math.round((VectorHightDistance*100));
+			}
+			//
+            function initLine(point1,point2) {
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0xffffff,
+                linewidth: 10,
+                linecap: 'round'
+            });
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints([point1,point2]);
+            return new THREE.Line(lineGeometry, lineMaterial);
+            }
+            //
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render( timestamp, frame ) {
+
+				if ( frame ) {
+
+					const referenceSpace = renderer.xr.getReferenceSpace();
+					const session = renderer.xr.getSession();
+
+					if ( hitTestSourceRequested === false ) {
+
+						session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
+
+							session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
+
+								hitTestSource = source;
+
+							} );
+
+						} );
+
+						session.addEventListener( 'end', function () {
+
+							hitTestSourceRequested = false;
+							hitTestSource = null;
+
+							document.getElementById("place-button").style.display = "none";
+
+                            scantarget_Y.visible = false;
+                            scantarget_X.visible = false;
+
+						} );
+
+							hitTestSourceRequested = true;
+
+					}
+
+					if ( hitTestSource ) {
+
+						const hitTestResults = frame.getHitTestResults( hitTestSource );
+
+						if ( hitTestResults.length !== 0) {
+
+						const hit = hitTestResults[ 0 ];
+						scantarget_Y.matrix.fromArray( hit.getPose( referenceSpace ).transform.matrix );
+						scantarget_Y.getWorldPosition(worldCenterLocation);
+                        
+                            if(setupSteps === setupStepLocateFloorY)
+                                {
+                                scantarget_Y.visible = true;
+                                document.getElementById("place-button").style.display = "block";
+                                }
+                            else if(setupSteps === setupStepLocateFloorX)
+                                {
+                                scantarget_X.visible = true;
+                                scantarget_Y.visible = false;
+                                scantarget_X.position.x = worldCenterLocation.x;
+                                scantarget_X.position.y = worldYPosition;
+                                scantarget_X.position.z = worldCenterLocation.z;
+                                
+                                }
+                            else if(setupSteps === setupStepLocateFloorZ)
+                                {
+                                scantarget_Z.visible = true;
+                                scantarget_X.visible = false;
+                                scantarget_Z.position.x = worldCenterLocation.x;
+                                scantarget_Z.position.y = worldYPosition;
+                                scantarget_Z.position.z = worldCenterLocation.z;
+                                /*
+                                const GetStep01Text = (document.querySelector("#step01_clickARBitton").style.display = "none"); // We hide this.
+                                const GetStep02Text = (document.querySelector("#step02_PlaceWallTarget").style.display = "block"); // And we whow this.
+                                document.getElementById("place-button").style.display = "block";
+                                */
+                                }
+						} 
+                        else
+                        {
+							scantarget_Y.visible = false;
+							document.getElementById("place-button").style.display = "none";
+						}
+					}
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
